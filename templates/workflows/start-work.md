@@ -132,6 +132,19 @@ During the self-review (GEMINI.md Step 2), also check for AI slop patterns from 
 - Summarize what was implemented, verified, and any issues encountered
 - Re-read the original plan one final time — did you miss anything?
 
+#### e) Stuck During Verification
+
+If a build or test command hangs during this phase, follow the Long-Running Command Protocol from `error-recovery.md`:
+
+1. **Apply poll discipline** — poll `command_status` at 60s intervals. If output hasn't grown for 2 consecutive polls, the command is hung.
+2. **Kill it** — call `send_command_input(CommandId, Terminate=true)`. Do not leave it running.
+3. **Mark the task blocked** — in `task.md` and `.amag/active-plan.md`, annotate the hung task as `[blocked]` (not complete, not failed).
+4. **Notify the user** via `notify_user` with:
+   - Which command hung and what it was verifying
+   - The last lines of partial output seen
+   - What was already verified before the hang
+5. **Do NOT mark the plan complete** while any task remains unverified due to a hang.
+
 ### 6. Mark Plan Complete
 
 1. Update `.amag/active-plan.md` YAML header: `status: completed`, `last_updated`

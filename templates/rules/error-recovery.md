@@ -42,9 +42,40 @@ After the **second** time a command produces the same error, timeout, or hangs:
 
 **The key insight**: If a command failed or timed out, making it wait longer is almost never the fix. The fix is understanding *why* it failed.
 
+---
+
+## Long-Running Command Protocol (CRITICAL)
+
+Some commands take legitimate time (large test suites, full builds, cargo compilation). But "takes a long time" and "silently hung" look identical if you don't actively check. You MUST distinguish between them.
+
+### Poll discipline
+
+- Use `WaitDurationSeconds: 60` maximum per `command_status` call. **Never use 300.** Waiting 5 minutes per poll burns context and prevents any decision-making.
+- After each poll, **read the partial output**. Note how many lines appeared since the last poll.
+- If the output is growing → the command is making progress. Keep polling.
+- If the output has not grown for **2 consecutive polls** → the command is hung. Act immediately.
+
+### When hung: KILL IT
+
+This is a hard instruction. When a command is confirmed hung:
+
+1. **Call `send_command_input(CommandId, Terminate=true)`** — this kills the process. Do NOT skip this step and keep polling. A hung process left running blocks the agent indefinitely.
+2. **Read whatever partial output exists** — look for the last line of output. Where did it stop? What was it doing?
+3. **Diagnose the root cause**: Did a test block waiting for I/O? Did a build step stall on a missing resource? Did execution reach an infinite loop?
+4. **Decide a different approach** before re-running:
+   - Add a timeout flag: `cargo test -- --test-timeout 30`, `npm test -- --forceExit`
+   - Run a subset: target a specific test file or module instead of the full suite
+   - Skip and report: if the hang cannot be resolved, **report to the user** with what was tried
+
+### Self-counting rule for hung commands
+
+"Still running with zero output growth" counts the same as a failed command for the purpose of the 3-failure escalation rule. Do not assume a hung command is "different" from a failing command just because it has no error message.
+
+---
+
 ## 3-Failure Escalation (All Failure Types)
 
-After 3 consecutive failed attempts on the same issue (whether fix attempts, command retries, or any repeated action):
+After 3 consecutive failed attempts on the same issue (whether fix attempts, command retries, hung-and-killed commands, or any repeated action):
 
 1. **STOP** all further attempts immediately
 2. **REVERT** to last known working state (undo edits or `git checkout`)

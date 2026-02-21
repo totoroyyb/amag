@@ -90,6 +90,8 @@ WRONG: Sequential when parallel is possible
 | Understand file structure | `view_file_outline` | Always first for new files |
 | Read specific code | `view_code_item` / `view_file` | Use outline first, then targeted reads |
 | Run builds/tests/lint | `run_command` | Background for long-running ops via `command_status` |
+| Check background command | `command_status` | Poll at 60s intervals max; read partial output each time |
+| Kill a hung command | `send_command_input(Terminate=true)` | Use when command is confirmed hung — see Long-Running Command Protocol |
 | Search the web | `search_web` / `read_url_content` | For docs, APIs, best practices |
 | Browser interactions | `browser_subagent` | Visual testing, UI verification |
 | Track multi-step work | `task_boundary` | Update status as you progress |
@@ -99,6 +101,15 @@ WRONG: Sequential when parallel is possible
 | Architecture decisions / hard debugging | `architecture-advisor` skill | Read-only consulting mode — load after 2+ failed attempts or for system design |
 | Pre-plan gap analysis | `planning-critic` skill | Find missing requirements before generating a plan — `/plan` Step 6 |
 | Post-plan validation | `plan-validator` skill | Adversarial plan check — `/plan` Step 8 and `/start-work` final verification |
+
+### Long-Running Command Guidance
+
+When a command runs in the background (build, test suite, compilation):
+
+1. **Poll at 60s intervals** — set `WaitDurationSeconds: 60`, never higher. Waiting 300s per poll is not "being patient" — it blocks all decision-making for 5 minutes per cycle.
+2. **Read partial output every poll** — count how many new lines appeared. Growing output = making progress. Zero growth for 2 polls = hung.
+3. **When hung: kill it** — call `send_command_input(CommandId, Terminate=true)`. Never leave a hung process running. Read the partial output, diagnose where it stopped, then decide on a different approach.
+4. **See `error-recovery.md` Long-Running Command Protocol** for the full decision tree.
 
 ### Exploration Protocol
 
@@ -291,3 +302,5 @@ When facing architecture decisions, debugging hard problems, or reviewing existi
 | Empty catch blocks | Never |
 | Shotgun debugging (random changes hoping something works) | Never |
 | Blind retry (re-running same failing command/action without diagnosing why it failed) | Never |
+| `WaitDurationSeconds > 60` on `command_status` | Never |
+| Leaving a hung background command running without killing it | Never |
