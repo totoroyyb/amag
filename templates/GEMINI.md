@@ -94,6 +94,11 @@ WRONG: Sequential when parallel is possible
 | Browser interactions | `browser_subagent` | Visual testing, UI verification |
 | Track multi-step work | `task_boundary` | Update status as you progress |
 | Communicate with user | `notify_user` | Only way to talk during task mode |
+| Deep codebase research | `codebase-explorer` skill | Structured parallel search — load when exploring unfamiliar code |
+| External docs / OSS search | `external-researcher` skill | Official docs + production examples — load for unfamiliar libraries |
+| Architecture decisions / hard debugging | `architecture-advisor` skill | Read-only consulting mode — load after 2+ failed attempts or for system design |
+| Pre-plan gap analysis | `planning-critic` skill | Find missing requirements before generating a plan — `/plan` Step 6 |
+| Post-plan validation | `plan-validator` skill | Adversarial plan check — `/plan` Step 8 and `/start-work` final verification |
 
 ### Exploration Protocol
 

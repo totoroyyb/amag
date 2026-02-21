@@ -2,7 +2,7 @@
 
 ## MUST READ FILES
 
-- `AGENTS.md` file in the root directory of the project if it exists: This file should server as part of your RULES.
+- ALWAYS read `AGENTS.md` file in the root directory of the project/workspace if it exists: This file MUST server as part of your RULES.
 
 ## On Session Start
 

@@ -105,14 +105,25 @@ This is not a formality. This is where you catch everything the per-task checks 
 Follow the full Verification Protocol from `GEMINI.md` (Steps 1-6) across ALL files modified during the entire plan, PLUS these plan-specific checks:
 
 #### a) Scope Fidelity — Plan vs Reality
+
+Activate `plan-validator` skill for this check.
+
 - For each task in the plan: verify it was implemented completely
 - Check: nothing was built that the plan didn't specify (scope creep)
 - Check: nothing was skipped or simplified ("basic version")
 - Check: "Must NOT Have" guardrails from the plan were respected
+- Output: `Tasks [N/N compliant] | VERDICT: APPROVE/REJECT`
+
+If REJECT: fix flagged issues before proceeding to step `b)`.
 
 #### b) Acceptance Criteria
+
+Activate `plan-validator` skill for this check.
+
 - Verify EVERY acceptance criterion from the plan with tool-produced evidence
+- Run QA scenarios from the plan: follow exact steps, capture evidence
 - No criterion passes on assertion alone — run the command, show the output
+- Output: `Criteria [N/N pass] | QA Scenarios [N/N pass] | Evidence [CAPTURED]`
 
 #### c) AI Slop Visual Check
 During the self-review (GEMINI.md Step 2), also check for AI slop patterns from `code-quality.md` Section 6 (generic names, over-abstraction, excessive comments, commented-out code). These require judgment — `grep_search` can't reliably detect them.
