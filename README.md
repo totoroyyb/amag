@@ -1,31 +1,31 @@
-# SuperAG
+# AMAG
 
 OmO-style agent orchestration for [Antigravity](https://antigravity.google). Curated rules, workflows, and skills that transform Antigravity's AI agent into a disciplined engineering team.
 
 ## What is this?
 
-SuperAG brings the best ideas from [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) to Google Antigravity — without the overhead. No hooks, no multi-model routing, no platform-specific ceremony. Just high-quality prompt engineering that works natively with Antigravity's tools.
+AMAG brings the best ideas from [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) to Google Antigravity — without the overhead. No hooks, no multi-model routing, no platform-specific ceremony. Just high-quality prompt engineering that works natively with Antigravity's tools.
 
 ## Install
 
 ```bash
 # Clone and install
-git clone https://github.com/your-org/superag.git
-cd superag
+git clone https://github.com/your-org/amag.git
+cd amag
 npm install
 npm run build
 
 # Install into any project
 cd /path/to/your/project
-npx superag init
+npx amag init
 ```
 
 Or install individual components:
 
 ```bash
-superag add rule code-quality
-superag add workflow ultrawork
-superag add skill git-master
+amag add rule code-quality
+amag add workflow ultrawork
+amag add skill git-master
 ```
 
 ## What Gets Installed
@@ -65,10 +65,10 @@ The core system prompt — adapts the Sisyphus orchestrator pattern for Antigrav
 ## CLI Commands
 
 ```bash
-superag init              # Install everything
-superag add <type> <name> # Install one component
-superag list              # Show available components
-superag doctor            # Check installation status
+amag init              # Install everything
+amag add <type> <name> # Install one component
+amag list              # Show available components
+amag doctor            # Check installation status
 ```
 
 ## Design Philosophy

@@ -9,7 +9,7 @@ import readline from "node:readline/promises";
 const program = new Command();
 
 program
-    .name("superag")
+    .name("amag")
     .description(
         "OmO-style agent orchestration for Antigravity — install rules, workflows, and skills"
     )
@@ -17,7 +17,7 @@ program
 
 program
     .command("init")
-    .description("Install all SuperAG components (skips existing files with warning)")
+    .description("Install all AMAG components (skips existing files with warning)")
     .option("-t, --target <dir>", "Target project directory", ".")
     .option("--no-gemini-md", "Skip generating GEMINI.md at project root")
     .action(async (options) => {
@@ -26,7 +26,7 @@ program
 
 program
     .command("update")
-    .description("Overwrite all SuperAG components with latest templates")
+    .description("Overwrite all AMAG components with latest templates")
     .option("-t, --target <dir>", "Target project directory", ".")
     .option("--no-gemini-md", "Skip updating GEMINI.md at project root")
     .action(async (options) => {
@@ -45,14 +45,14 @@ program
 
 program
     .command("uninstall")
-    .description("Remove all SuperAG-managed files from the target project")
+    .description("Remove all AMAG-managed files from the target project")
     .option("-t, --target <dir>", "Target project directory", ".")
     .option("--keep-gemini-md", "Keep GEMINI.md at project root")
     .option("-f, --force", "Skip confirmation prompt")
     .action(async (options) => {
         if (!options.force) {
             const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-            const answer = await rl.question("This will remove all SuperAG components. Continue? (y/N) ");
+            const answer = await rl.question("This will remove all AMAG components. Continue? (y/N) ");
             rl.close();
             if (answer.toLowerCase() !== "y") {
                 console.log("Cancelled.");
@@ -81,7 +81,7 @@ program
 
 program
     .command("doctor")
-    .description("Check what SuperAG components are installed in the target project")
+    .description("Check what AMAG components are installed in the target project")
     .option("-t, --target <dir>", "Target project directory", ".")
     .action(async (options) => {
         await doctorCheck(options.target);

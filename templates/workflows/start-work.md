@@ -14,10 +14,10 @@ Read an existing plan and execute it task-by-task with verification. This is the
 
 **Check both sources and combine:**
 
-1. Read `.superag/active-plan.md` in the project root (cross-session truth for checkbox state)
+1. Read `.amag/active-plan.md` in the project root (cross-session truth for checkbox state)
 2. Check for an `implementation_plan.md` artifact in this conversation (detailed plan with file references, acceptance criteria)
 
-**If `.superag/active-plan.md` exists:**
+**If `.amag/active-plan.md` exists:**
 - **Self-validate** — parse all `- [ ]` and `- [x]` checkboxes
 - Calculate actual progress: `completed / total`
 - If all tasks checked → inform user: "Plan is complete. Use `/plan` for new work."
@@ -26,18 +26,18 @@ Read an existing plan and execute it task-by-task with verification. This is the
 
 **If only `implementation_plan.md` artifact exists (no active-plan.md):**
 - This means the plan was approved but Step 8 of `/plan` wasn't executed, or this is the first `/start-work` in the same conversation
-- Create `.superag/active-plan.md` from the artifact's task list before proceeding
+- Create `.amag/active-plan.md` from the artifact's task list before proceeding
 
 **If neither found:**
 - Tell the user: "No active plan found. Use `/plan` to create one."
 
 ### 2. Create Task Breakdown
 
-Create a `task.md` artifact with all tasks from the plan. Copy checkbox state from `.superag/active-plan.md` if resuming.
+Create a `task.md` artifact with all tasks from the plan. Copy checkbox state from `.amag/active-plan.md` if resuming.
 
 Update `task_boundary` to reflect current state.
 
-Update `.superag/active-plan.md` YAML header:
+Update `.amag/active-plan.md` YAML header:
 - Set `status: in-progress`
 - Set `last_updated` to current timestamp
 
@@ -83,7 +83,7 @@ Mark task as completed only AFTER verification passes.
 
 All three updates must happen together:
 
-1. **`.superag/active-plan.md`** — mark `[x]` on the completed task, update `last_updated` in YAML header
+1. **`.amag/active-plan.md`** — mark `[x]` on the completed task, update `last_updated` in YAML header
 2. **`task.md` artifact** — mark `[x]` on the completed task
 3. **`task_boundary`** — update TaskStatus and TaskSummary
 
@@ -123,7 +123,7 @@ During the self-review (GEMINI.md Step 2), also check for AI slop patterns from 
 
 ### 6. Mark Plan Complete
 
-1. Update `.superag/active-plan.md` YAML header: `status: completed`, `last_updated`
+1. Update `.amag/active-plan.md` YAML header: `status: completed`, `last_updated`
 2. Create `walkthrough.md` artifact summarizing what was implemented and verified
 3. Do NOT delete `active-plan.md` — leave it as a completed record
 
@@ -131,7 +131,7 @@ During the self-review (GEMINI.md Step 2), also check for AI slop patterns from 
 
 If the session is interrupted mid-work:
 
-- `.superag/active-plan.md` checkboxes reflect exactly which tasks are done
+- `.amag/active-plan.md` checkboxes reflect exactly which tasks are done
 - A new session can read this file, self-validate, and resume at the first unchecked task
 - No external state files or session IDs needed — the checkboxes are the truth
 
@@ -139,4 +139,4 @@ If the session is interrupted mid-work:
 
 - After `/plan` generates and user approves an implementation plan
 - User says "start work", "execute the plan", or "start-work"
-- When there's an existing plan to execute (in conversation or `.superag/active-plan.md`)
+- When there's an existing plan to execute (in conversation or `.amag/active-plan.md`)

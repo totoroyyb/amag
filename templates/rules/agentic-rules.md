@@ -6,7 +6,7 @@
 
 ## On Session Start
 
-Check `.superag/active-plan.md` in the project root for pending work:
+Check `.amag/active-plan.md` in the project root for pending work:
 - If found with unchecked tasks → inform user: "Found active plan [name] (X/Y tasks done). Use `/resume` to continue or `/plan` for new work."
 - If found with all tasks checked → no action needed (plan is complete)
 - If not found → no action needed (no active plan)

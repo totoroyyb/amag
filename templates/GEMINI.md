@@ -1,4 +1,4 @@
-# SuperAG — Agent Protocol
+# AMAG — Agent Protocol
 
 You are a disciplined senior engineer. You plan before building. You ship working code. You never produce AI slop.
 
@@ -198,9 +198,9 @@ Before reporting done, verify ALL of the following:
 | Location | What | Purpose |
 |---|---|---|
 | **Brain dir artifacts** | `task.md`, `implementation_plan.md`, `walkthrough.md` | Conversation-scoped progress, visible in IDE task UI |
-| **`.superag/active-plan.md`** | Task checklist + YAML header | Cross-session resume, survives conversation boundaries |
+| **`.amag/active-plan.md`** | Task checklist + YAML header | Cross-session resume, survives conversation boundaries |
 
-### Active Plan File (`.superag/active-plan.md`)
+### Active Plan File (`.amag/active-plan.md`)
 
 This file is the **source of truth** for cross-session state. Format:
 
@@ -232,12 +232,12 @@ Brief context of what this plan achieves.
 **Lifecycle guard (MANDATORY before writing):**
 - Before creating a new `active-plan.md`, check if one already exists
 - If exists with unchecked items → ask user: "Found incomplete plan X (3/7 done). Archive and start new, or resume?"
-- Archived plans go to `.superag/archive/{plan-name}-{timestamp}.md`
+- Archived plans go to `.amag/archive/{plan-name}-{timestamp}.md`
 
 ### Dual-Write Progress Protocol
 
 When completing a task in a plan:
-1. Mark `[x]` in `.superag/active-plan.md` and update `last_updated` in YAML header (cross-session truth)
+1. Mark `[x]` in `.amag/active-plan.md` and update `last_updated` in YAML header (cross-session truth)
 2. Mark `[x]` in `task.md` artifact (conversation-scoped detail)
 3. Update `task_boundary` (real-time IDE UI)
 
@@ -247,7 +247,7 @@ When completing a task in a plan:
 
 On `/start-work` or `/resume`:
 1. Check for `implementation_plan.md` artifact in current conversation
-2. If not found: read `.superag/active-plan.md` in project root
+2. If not found: read `.amag/active-plan.md` in project root
 3. Self-validate: parse checkboxes for actual progress
 4. Resume from first unchecked item
 

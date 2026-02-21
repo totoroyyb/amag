@@ -80,7 +80,7 @@ export async function initCommand(
     const projectDir = resolveProjectDir(targetDir);
     const templatesDir = getTemplatesDir();
 
-    log.header(`SuperAG — Installing to ${projectDir}`);
+    log.header(`AMAG — Installing to ${projectDir}`);
 
     // Check for existing files and warn
     if (!options.force) {
@@ -91,7 +91,7 @@ export async function initCommand(
                 log.info(`  • ${name}`);
             }
             console.log();
-            log.info("Use `superag update` to overwrite existing files with latest templates.");
+            log.info("Use `amag update` to overwrite existing files with latest templates.");
             console.log();
 
             if (confirmFn) {
@@ -119,8 +119,8 @@ export async function initCommand(
         );
     }
 
-    log.success("\nDone! SuperAG is installed.");
-    log.info("Run `superag doctor` to verify installation.");
+    log.success("\nDone! AMAG is installed.");
+    log.info("Run `amag doctor` to verify installation.");
 }
 
 export async function updateCommand(
@@ -130,7 +130,7 @@ export async function updateCommand(
     const projectDir = resolveProjectDir(targetDir);
     const templatesDir = getTemplatesDir();
 
-    log.header(`SuperAG — Updating ${projectDir}`);
+    log.header(`AMAG — Updating ${projectDir}`);
 
     let updated = 0;
     let created = 0;
@@ -173,7 +173,7 @@ export async function addComponent(
 
     const comp = COMPONENTS.find((c) => c.type === type && c.name === name);
     if (!comp) {
-        log.error(`Unknown ${type} "${name}". Run \`superag list\` to see available components.`);
+        log.error(`Unknown ${type} "${name}". Run \`amag list\` to see available components.`);
         process.exit(1);
     }
 
@@ -190,7 +190,7 @@ export async function uninstallCommand(
 ): Promise<void> {
     const projectDir = resolveProjectDir(targetDir);
 
-    log.header(`SuperAG — Uninstalling from ${projectDir}`);
+    log.header(`AMAG — Uninstalling from ${projectDir}`);
 
     let removed = 0;
     let absent = 0;
@@ -248,7 +248,7 @@ export async function removeComponent(
 
     const comp = COMPONENTS.find((c) => c.type === type && c.name === name);
     if (!comp) {
-        log.error(`Unknown ${type} "${name}". Run \`superag list\` to see available components.`);
+        log.error(`Unknown ${type} "${name}". Run \`amag list\` to see available components.`);
         process.exit(1);
     }
 

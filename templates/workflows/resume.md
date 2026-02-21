@@ -4,13 +4,13 @@ description: Resume work from a previous plan — self-validates progress and co
 
 # /resume — Cross-Session Resume
 
-Pick up where you left off. Reads `.superag/active-plan.md`, validates actual progress via checkboxes, and resumes from the first uncompleted task.
+Pick up where you left off. Reads `.amag/active-plan.md`, validates actual progress via checkboxes, and resumes from the first uncompleted task.
 
 ## Steps
 
 ### 1. Read Active Plan
 
-Read `.superag/active-plan.md` in the project root.
+Read `.amag/active-plan.md` in the project root.
 
 - **Not found** → "No active plan. Use `/plan` to create one."
 - **Found** → proceed to self-validation
@@ -36,18 +36,18 @@ Calculate: `completed / total`
 
 ### 3. Rebuild Context
 
-1. Read `.superag/active-plan.md` for task list and progress
+1. Read `.amag/active-plan.md` for task list and progress
 2. Search for an `implementation_plan.md` artifact (if in the same conversation that created it)
 3. If detailed plan not available (new conversation): the checklist in `active-plan.md` is sufficient to continue
 4. Create `task.md` artifact in this conversation, seeded from `active-plan.md` checkboxes
 
 ### 4. Begin Execution
 
-1. Set `status: in-progress` and `last_updated` in `.superag/active-plan.md`
+1. Set `status: in-progress` and `last_updated` in `.amag/active-plan.md`
 2. Set `task_boundary` with first uncompleted task
 3. Execute following `/start-work` protocol from Step 3 onwards
 
-All progress updates follow the **dual-write protocol**: update both `.superag/active-plan.md` and `task.md` artifact simultaneously.
+All progress updates follow the **dual-write protocol**: update both `.amag/active-plan.md` and `task.md` artifact simultaneously.
 
 ## When to Use
 

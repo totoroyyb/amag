@@ -82,7 +82,7 @@ Follow the full Verification Protocol from `GEMINI.md` (Steps 1-6), PLUS these u
 Even in ultrawork mode, track your work:
 1. Create `task.md` artifact immediately with task breakdown
 2. Update `task_boundary` at each major phase transition
-3. If working from a plan: dual-write progress to both `task.md` and `.superag/active-plan.md`
+3. If working from a plan: dual-write progress to both `task.md` and `.amag/active-plan.md`
 4. On completion: mark all items done, update `last_updated` timestamps
 
 ### Completion Self-Check

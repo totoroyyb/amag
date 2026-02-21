@@ -56,7 +56,7 @@ export const COMPONENTS: Component[] = [
     {
         type: "workflow",
         name: "resume",
-        description: "/resume — Cross-session resume from .superag/active-plan.md with self-validation",
+        description: "/resume — Cross-session resume from .amag/active-plan.md with self-validation",
     },
 
     // Skills (on-demand expertise)
@@ -88,7 +88,7 @@ export const COMPONENTS: Component[] = [
 ];
 
 export function listComponents(): void {
-    log.header("SuperAG Components\n");
+    log.header("AMAG Components\n");
 
     const groups: Record<ComponentType, Component[]> = {
         rule: [],
@@ -114,5 +114,5 @@ export function listComponents(): void {
         console.log();
     }
 
-    console.log(chalk.dim("+ GEMINI.md (root context prompt — installed with `superag init`)"));
+    console.log(chalk.dim("+ GEMINI.md (root context prompt — installed with `amag init`)"));
 }

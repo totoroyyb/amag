@@ -75,7 +75,7 @@ export async function cleanEmptyDirs(
 export async function doctorCheck(targetDir: string): Promise<void> {
     const projectDir = resolveProjectDir(targetDir);
 
-    log.header(`SuperAG Doctor — Checking ${projectDir}\n`);
+    log.header(`AMAG Doctor — Checking ${projectDir}\n`);
 
     const DEST_MAP: Record<ComponentType, string> = {
         rule: ".agent/rules",
@@ -124,6 +124,6 @@ export async function doctorCheck(targetDir: string): Promise<void> {
     );
 
     if (missing > 0) {
-        log.info('Run `superag init` to install all components.');
+        log.info('Run `amag init` to install all components.');
     }
 }

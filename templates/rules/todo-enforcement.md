@@ -22,15 +22,15 @@
 |------|------|------|
 | `task_boundary` | Every task transition | Real-time IDE UI updates |
 | `task.md` artifact | Every task completion | Conversation-scoped checklist |
-| `.superag/active-plan.md` | Every task completion (plan-driven work) | Cross-session truth |
+| `.amag/active-plan.md` | Every task completion (plan-driven work) | Cross-session truth |
 
-**Dual-write rule**: When working from a plan, update BOTH `task.md` artifact AND `.superag/active-plan.md` on every task completion. Never update one without the other.
+**Dual-write rule**: When working from a plan, update BOTH `task.md` artifact AND `.amag/active-plan.md` on every task completion. Never update one without the other.
 
 ## Why This Matters
 
 - **User visibility**: User sees real-time progress, not a black box
 - **Prevents drift**: Task list anchors you to the actual request
-- **Recovery**: If interrupted, `.superag/active-plan.md` enables seamless cross-session resume
+- **Recovery**: If interrupted, `.amag/active-plan.md` enables seamless cross-session resume
 - **Accountability**: Each item = explicit commitment
 
 ## Anti-Patterns (Violations)

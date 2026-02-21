@@ -120,11 +120,11 @@ Present via `notify_user` with `BlockedOnUser: true` and `ShouldAutoProceed: fal
 
 Once the user approves the plan:
 
-1. **Check for existing plan**: Read `.superag/active-plan.md` in project root
+1. **Check for existing plan**: Read `.amag/active-plan.md` in project root
    - If exists with unchecked tasks → ask user: "Found incomplete plan [name] (X/Y done). Archive and start new, or resume?"
-   - If user says archive → move to `.superag/archive/{plan-name}-{timestamp}.md`
+   - If user says archive → move to `.amag/archive/{plan-name}-{timestamp}.md`
 
-2. **Write `.superag/active-plan.md`** with:
+2. **Write `.amag/active-plan.md`** with:
 
 ```markdown
 ---

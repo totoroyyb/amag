@@ -1,10 +1,10 @@
 {
-  "name": "superag",
+  "name": "amag",
   "version": "0.1.0",
   "description": "OmO-style agent orchestration for Antigravity — rules, workflows, skills, and a CLI to install them",
   "type": "module",
   "bin": {
-    "superag": "./dist/index.js"
+    "amag": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
