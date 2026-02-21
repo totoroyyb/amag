@@ -7,9 +7,11 @@
     "amag": "./dist/index.js"
   },
   "scripts": {
+    "prebuild": "tsx scripts/validate-registry.ts",
     "build": "tsc",
     "dev": "tsx src/index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate-registry": "tsx scripts/validate-registry.ts"
   },
   "dependencies": {
     "chalk": "^5.4.1",

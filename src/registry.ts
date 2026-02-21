@@ -85,6 +85,31 @@ export const COMPONENTS: Component[] = [
         name: "writing",
         description: "Anti-AI-slop writing — plain words, human tone, zero filler, varied sentences",
     },
+    {
+        type: "skill",
+        name: "architecture-advisor",
+        description: "Architecture consulting — read-only design review, simplicity bias, evidence-based recommendations",
+    },
+    {
+        type: "skill",
+        name: "codebase-explorer",
+        description: "Structured parallel codebase research — multi-angle search, cross-validation, mental model building",
+    },
+    {
+        type: "skill",
+        name: "external-researcher",
+        description: "External library/API research — official docs, production examples, current best practices",
+    },
+    {
+        type: "skill",
+        name: "plan-validator",
+        description: "Adversarial plan validation — find gaps, risks, and missing requirements before execution",
+    },
+    {
+        type: "skill",
+        name: "planning-critic",
+        description: "Pre-plan gap analysis — identify missing requirements and ambiguities before generating a plan",
+    },
 ];
 
 export function listComponents(): void {
