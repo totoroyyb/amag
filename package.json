@@ -1,0 +1,28 @@
+{
+  "name": "superag",
+  "version": "0.1.0",
+  "description": "OmO-style agent orchestration for Antigravity — rules, workflows, skills, and a CLI to install them",
+  "type": "module",
+  "bin": {
+    "superag": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "fs-extra": "^11.3.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

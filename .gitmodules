@@ -1,0 +1,6 @@
+[submodule "deps/oh-my-opencode"]
+	path = deps/oh-my-opencode
+	url = https://github.com/code-yeongyu/oh-my-opencode.git
+[submodule "deps/oh-my-claudecode"]
+	path = deps/oh-my-claudecode
+	url = https://github.com/Yeachan-Heo/oh-my-claudecode.git
