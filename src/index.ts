@@ -87,5 +87,44 @@ program
         await doctorCheck(options.target);
     });
 
+const configCmd = program
+    .command("config")
+    .description("Manage AMAG review configuration");
+
+configCmd
+    .command("show")
+    .description("Show current review configuration")
+    .option("-t, --target <dir>", "Target project directory", ".")
+    .action(async (options) => {
+        const { readConfig } = await import("./config.js");
+        const config = await readConfig(options.target);
+        console.log(JSON.stringify(config, null, 2));
+    });
+
+configCmd
+    .command("set <path> <value>")
+    .description("Set a config value (e.g. review.consultant.cli codex)")
+    .option("-t, --target <dir>", "Target project directory", ".")
+    .action(async (dotPath, value, options) => {
+        const { setConfigValue, readConfig } = await import("./config.js");
+        await setConfigValue(options.target, dotPath, value);
+        const config = await readConfig(options.target);
+        const { log } = await import("./utils.js");
+        log.success(`Set ${dotPath} = ${value}`);
+        console.log(JSON.stringify(config, null, 2));
+    });
+
+configCmd
+    .command("reset")
+    .description("Reset configuration to defaults")
+    .option("-t, --target <dir>", "Target project directory", ".")
+    .action(async (options) => {
+        const { writeConfig, getDefaultConfig } = await import("./config.js");
+        await writeConfig(options.target, getDefaultConfig());
+        const { log } = await import("./utils.js");
+        log.success("Configuration reset to defaults");
+        console.log(JSON.stringify(getDefaultConfig(), null, 2));
+    });
+
 program.parse();
 

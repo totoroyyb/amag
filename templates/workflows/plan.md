@@ -236,15 +236,22 @@ Before generating the plan, check your planned scope for these patterns:
 
 ## Step 6: Pre-Generation Gap Review
 
-Load `planning-critic` skill. Perform a structured adversarial self-review before writing a single line of the plan.
+Load `plan-consultant` skill. The skill handles backend detection (CLI vs self-review) and uses AG-native tools (`run_command`, `view_file`, `write_to_file`) for the review. No external infrastructure needed.
 
-Run through all six gap categories from the `planning-critic` skill:
+The skill will:
+1. Check `.amag/config.json` for CLI configuration
+2. If CLI available → spawn via `run_command` for independent analysis
+3. If no CLI → perform enhanced self-review with structured gap analysis
+
+Either path runs through all six gap categories:
 1. Questions not asked
 2. Missing guardrails (Must NOT Have)
 3. Scope creep risks
 4. Unvalidated assumptions
 5. Missing acceptance criteria
 6. Unaddressed edge cases
+
+Review files are written to `.amag/reviews/` for auditability.
 
 **Handle gaps:**
 - **CRITICAL** (requires user input) → surface via `notify_user` → wait for answer → re-run clearance check → re-run gap review → then generate plan
@@ -291,7 +298,7 @@ Create `implementation_plan.md` artifact with this structure:
 
 ---
 
-## Planning Critic Summary
+## Plan Consultant Summary
 
 **Gaps resolved before generation:**
 - Minor: [gap] → [how resolved]
@@ -385,9 +392,9 @@ Wave FINAL (After all tasks — verification):
 
 > Runs AFTER all implementation tasks complete.
 
-- [ ] FV1. **Scope Fidelity** — activate `plan-validator` skill
+- [ ] FV1. **Scope Fidelity** — activate `plan-critic` skill
   For each task: read "What to do", compare against actual changes. Verify nothing was missed (partial delivery) and nothing was added beyond spec (scope creep). Check "Must NOT do" compliance.
-  Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | VERDICT: APPROVE/REJECT`
+  Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | VERDICT: APPROVE/REVISE/REJECT`
 
 - [ ] FV2. **Code Quality** — activate `architecture-advisor` skill for review
   Run build + typecheck + tests. Scan all changed files for: `as any`/`@ts-ignore`, empty catches, `console.log` in production code, commented-out code, unused imports. Check AI slop (generic names, over-abstraction, excessive comments) per `code-quality.md` Section 6.
@@ -428,15 +435,19 @@ After generating the plan, present the user a choice via `notify_user`:
 >
 > - **Option A — Start Work**: Plan looks solid, proceed with `/start-work`.
 >
-> - **Option B — Critical Review Pass**: Activate `plan-validator` skill to adversarially check every file reference, acceptance criterion, and QA scenario. Adds a review pass but guarantees the plan is airtight."
+> - **Option B — Critical Review Pass**: Activate `plan-critic` skill for independent review. If a CLI agent is configured (codex/claude-code), it will provide an external perspective. Otherwise, enhanced self-review."
 
 **If Option B selected:**
-1. Load `plan-validator` skill
-2. Run full validation checklist against `implementation_plan.md`
-3. If REJECT: fix all flagged issues → re-run validation → loop until APPROVE
-4. Present APPROVE verdict to user
+1. Load `plan-critic` skill
+2. Skill detects backend (CLI vs self-review), spawns reviewer via `run_command` if available
+3. Review files written to `.amag/reviews/` for auditability
+4. If REVISE: fix all blocking issues → re-submit to critic → loop
+5. If REJECT: surface to user via `notify_user`
+6. If APPROVE: present verdict to user
 
 There is no maximum iteration limit. Loop until the plan passes or user explicitly cancels.
+
+After final APPROVE, archive reviews: `run_command: mkdir -p .amag/archive/reviews/{planId} && mv .amag/reviews/{planId}-* .amag/archive/reviews/{planId}/`
 
 ---
 

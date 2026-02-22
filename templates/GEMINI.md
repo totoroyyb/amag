@@ -159,8 +159,8 @@ WRONG: Sequential when parallel is possible
 | Architecture decisions / hard debugging | `architecture-advisor` skill | Read-only consulting mode — load after 2+ failed attempts or for system design |
 | Systematic debugging | `/debug` workflow | 5-phase root cause analysis — auto-engaged for hard bugs, or invoked explicitly |
 | Large-scale codebase understanding | `/explore` workflow | Multi-phase read-only exploration — auto-engaged for system-level understanding or explicit `/explore`. Never writes code |
-| Pre-plan gap analysis | `planning-critic` skill | Find missing requirements before generating a plan — `/plan` Step 6 |
-| Post-plan validation | `plan-validator` skill | Adversarial plan check — `/plan` Step 8 and `/start-work` final verification |
+| Pre-plan gap analysis | `plan-consultant` skill | Find missing requirements before generating a plan — `/plan` Step 6 |
+| Post-plan validation | `plan-critic` skill | Adversarial plan check — `/plan` Step 8 and `/start-work` final verification |
 
 ### Long-Running Command Guidance
 

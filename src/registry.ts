@@ -112,13 +112,13 @@ export const COMPONENTS: Component[] = [
     },
     {
         type: "skill",
-        name: "plan-validator",
-        description: "Adversarial plan validation — find gaps, risks, and missing requirements before execution",
+        name: "plan-critic",
+        description: "Post-generation plan review — verify references, executability, and acceptance criteria before execution",
     },
     {
         type: "skill",
-        name: "planning-critic",
-        description: "Pre-plan gap analysis — identify missing requirements and ambiguities before generating a plan",
+        name: "plan-consultant",
+        description: "Pre-plan gap analysis — identify missing requirements, ambiguities, and AI-slop risks before generating a plan",
     },
 ];
 
