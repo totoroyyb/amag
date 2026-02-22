@@ -112,6 +112,11 @@ export const COMPONENTS: Component[] = [
     },
     {
         type: "skill",
+        name: "external-cli-runner",
+        description: "Unified external CLI agent runner — backend detection, command dispatch, retry logic, response parsing",
+    },
+    {
+        type: "skill",
         name: "plan-critic",
         description: "Post-generation plan review — verify references, executability, and acceptance criteria before execution",
     },

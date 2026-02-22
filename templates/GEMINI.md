@@ -156,6 +156,7 @@ WRONG: Sequential when parallel is possible
 | Communicate with user | `notify_user` | Only way to talk during task mode |
 | Deep codebase research | `codebase-explorer` skill | Structured parallel search — load when exploring unfamiliar code |
 | External docs / OSS search | `external-researcher` skill | Official docs + production examples — load for unfamiliar libraries |
+| Run external CLI agents | `external-cli-runner` skill | Backend detection, command dispatch, 3-retry logic — load when delegating to claude/codex/gemini-cli |
 | Architecture decisions / hard debugging | `architecture-advisor` skill | Read-only consulting mode — load after 2+ failed attempts or for system design |
 | Systematic debugging | `/debug` workflow | 5-phase root cause analysis — auto-engaged for hard bugs, or invoked explicitly |
 | Large-scale codebase understanding | `/explore` workflow | Multi-phase read-only exploration — auto-engaged for system-level understanding or explicit `/explore`. Never writes code |

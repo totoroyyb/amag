@@ -5,7 +5,7 @@ description: Pre-generation gap analysis — surface hidden requirements, AI-slo
 
 # Plan Consultant
 
-Pre-planning analysis skill. Activated before generating a work plan. Identifies gaps, hidden requirements, and AI failure points — then classifies each for handling. Supports two backends: CLI agent review (via `run_command`) or enhanced self-review.
+Pre-planning analysis skill. Activated before generating a work plan. Identifies gaps, hidden requirements, and AI failure points — then classifies each for handling. Supports two backends: CLI agent review (via `external-cli-runner` skill) or enhanced self-review.
 
 Derived from OMO's Metis agent (pre-planning consultant, read-only, intent classification first).
 
@@ -13,38 +13,7 @@ Derived from OMO's Metis agent (pre-planning consultant, read-only, intent class
 
 **Only during `/plan` workflow**, at Step 6 (Pre-Generation Gap Review) — after the interview is complete and clearance check has passed, but BEFORE generating `implementation_plan.md`.
 
-## Step 1: Detect Review Backend
-
-1. Read `.amag/config.json` via `view_file`. Check `review.consultant` settings.
-2. If `cli` is set, verify availability:
-   ```
-   run_command: which <cli_name>
-   ```
-3. If exit 0 → **CLI Path** (Step 2A). If exit non-zero or no CLI configured → **Self-Review Path** (Step 2B).
-
-Update `task_boundary` with: `TaskStatus: "Plan consultant: detecting review backend..."`
-
-### Fallback Warning (MANDATORY when falling back to self-review)
-
-If CLI was configured but not found, **immediately surface a prominent warning** before proceeding:
-
-1. Update `task_boundary`: `TaskStatus: "⚠️ Plan consultant: CLI not found — falling back to self-review"`
-2. Include in output a clear alert:
-   ```
-   > [!CAUTION]
-   > **Review backend fallback**: Configured CLI `{cli_name}` was not found on PATH.
-   > Falling back to self-review (same agent reviewing its own work).
-   > For independent review, install the CLI: `npm install -g @openai/codex`
-   > or reconfigure: `amag config set review.consultant.cli null`
-   ```
-
-This ensures the user is never silently downgraded from independent CLI review to self-review.
-
-## Step 2A: CLI Review Path
-
-When a CLI agent is available, delegate the review for an independent perspective.
-
-### 1. Write Review Request
+## Step 1: Write Review Request
 
 Write the request file via `write_to_file` to `.amag/reviews/{planId}-consultant-request.md`.
 
@@ -149,62 +118,26 @@ verdict: APPROVE | REVISE
 ```
 ```
 
-### 2. Spawn CLI Agent
+## Step 2: Execute Review via CLI
 
-Read model and thinking level from config (defaults: `claude-opus-4-6`, thinking: `max`). Spawn via `run_command`.
+Load `external-cli-runner` skill. Invoke with:
+- **configPath**: `review.consultant`
+- **requestFile**: `.amag/reviews/{planId}-consultant-request.md`
+- **responseFileRaw**: `.amag/reviews/{planId}-consultant-response-raw.md`
+- **responseFile**: `.amag/reviews/{planId}-consultant-response.md`
+- **requiredField**: `verdict:`
+- **fallbackAction**: "Proceed to Step 3 (Self-Review Path)"
 
-**For claude:**
-```
-run_command: claude --print --model {model} --effort {thinking_mapped} --dangerously-skip-permissions < .amag/reviews/{planId}-consultant-request.md > .amag/reviews/{planId}-consultant-response-raw.md 2>&1
-```
+If the runner returns **success** → skip Step 3, proceed to **Step 4: Act on Verdict**.
+If the runner returns **failure** (CLI not found, or 3 retries exhausted) → proceed to **Step 3: Self-Review**.
 
-**For codex:**
-```
-run_command: codex exec --full-auto -m {model} -c model_reasoning_effort="{thinking_mapped}" -o .amag/reviews/{planId}-consultant-response-raw.md < .amag/reviews/{planId}-consultant-request.md
-```
+## Step 3: Self-Review Path (Fallback)
 
-If `-o` flag is not available on the installed version, fall back to stdout redirect:
-```
-run_command: codex exec --full-auto -m {model} -c model_reasoning_effort="{thinking_mapped}" < .amag/reviews/{planId}-consultant-request.md > .amag/reviews/{planId}-consultant-response-raw.md 2>&1
-```
-
-**For gemini-cli:**
-```
-run_command: cat .amag/reviews/{planId}-consultant-request.md | gemini --yolo > .amag/reviews/{planId}-consultant-response-raw.md 2>&1
-```
-
-**Thinking level mapping** (read from `review.consultant.thinking` in config):
-
-| Config value | claude `--effort` | codex `-c model_reasoning_effort` | gemini behavior |
-|---|---|---|---|
-| `max` | `high` | `high` | Default |
-| `high` | `high` | `high` | Default |
-| `medium` | `medium` | `medium` | Default |
-| `low` | `low` | `low` | Default |
-| `none` | `low` | `low` | Default |
-
-Set `WaitMsBeforeAsync: 500` to run async. Poll via `command_status` at 60s intervals. If no progress for 2 polls → `send_command_input(Terminate=true)` → fall back to Self-Review Path (Step 2B).
-
-> [!NOTE]
-> **No `--json` flag.** CLI output should be human-readable in the terminal for transparency. Structured capture happens via the response file, not JSON parsing.
-
-### 3. Parse Response
-
-If a raw response file was produced (`.amag/reviews/{planId}-consultant-response-raw.md`), read it via `view_file`. If the CLI wrote to stdout instead, read from `command_status` output.
-
-Clean up the raw output — strip ANSI codes, CLI chrome, or wrapper formatting — and write the final parsed response to `.amag/reviews/{planId}-consultant-response.md` via `write_to_file`.
-
-Verify the response contains the required `verdict:` line. If missing or malformed → fall back to Self-Review Path (Step 2B).
-
-Proceed to **Step 3: Act on Verdict**.
-
-## Step 2B: Self-Review Path
-
-When no CLI is available, perform enhanced self-review using the same evaluation criteria.
+When no CLI is available or CLI execution failed after retries.
 
 ### 1. Write Review Request
 
-Write the **same** request file as Step 2A to `.amag/reviews/{planId}-consultant-request.md`. This creates an audit trail and ensures identical evaluation criteria.
+If not already written in Step 1, write the **same** request file to `.amag/reviews/{planId}-consultant-request.md`.
 
 ### 2. Perform Self-Review
 
@@ -225,7 +158,7 @@ Read the request file back via `view_file`. **Adopt the consultant role** define
 
 Write response to `.amag/reviews/{planId}-consultant-response.md` using the exact same format as the CLI path. Set `backend: self-review` in metadata.
 
-## Step 3: Act on Verdict
+## Step 4: Act on Verdict
 
 Read `.amag/reviews/{planId}-consultant-response.md` via `view_file`.
 
