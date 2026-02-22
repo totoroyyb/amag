@@ -171,6 +171,7 @@ When a command runs in the background (build, test suite, compilation):
 2. **Read partial output every poll** — count how many new lines appeared. Growing output = making progress. Zero growth for 2 polls = hung.
 3. **When hung: kill it** — call `send_command_input(CommandId, Terminate=true)`. Never leave a hung process running. Read the partial output, diagnose where it stopped, then decide on a different approach.
 4. **See `error-recovery.md` Long-Running Command Protocol** for the full decision tree.
+5. **External CLI agents are exempt** — the poll-and-kill heuristic does not apply to external agent invocations (Claude, Codex, Gemini). Those use a wall-clock timeout defined in `external-cli-runner` skill. Do not kill an external agent just because it hasn't produced output for 2 polls.
 
 ### Exploration Protocol
 

@@ -71,6 +71,12 @@ This is a hard instruction. When a command is confirmed hung:
 
 "Still running with zero output growth" counts the same as a failed command for the purpose of the 3-failure escalation rule. Do not assume a hung command is "different" from a failing command just because it has no error message.
 
+### Scope: Development Commands Only
+
+The poll-and-kill protocol above applies to **development commands** — builds, tests, linters, compilation, dev servers. These commands stream output continuously; silence indicates a hang.
+
+**External CLI agents** (Claude, Codex, Gemini invoked via `external-cli-runner` skill) have their own timeout strategy defined in the runner skill. They produce no output while thinking, so the output-growth heuristic does not apply. Do not use this section's hang detection for external agent invocations.
+
 ---
 
 ## 3-Failure Escalation (All Failure Types)

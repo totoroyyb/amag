@@ -100,12 +100,24 @@ run_command: cat {requestFile} | gemini --yolo > {responseFileRaw} 2>&1
 
 ### Execution Protocol
 
-Set `WaitMsBeforeAsync: 500` to run async. Poll via `command_status` at 60s intervals.
+Set `WaitMsBeforeAsync: 500` to run async. Poll via `command_status` at 30s intervals.
 
-If no output progress for 2 consecutive polls → `send_command_input(Terminate=true)` → count as a failed attempt.
+> [!IMPORTANT]
+> **External CLI agents are NOT development commands.** They legitimately produce zero
+> stdout for minutes while thinking. Do NOT apply the "2 consecutive polls with no
+> output growth = hung" rule from `error-recovery.md` here. That rule is for builds,
+> tests, and linters — not AI agent invocations.
 
-> [!NOTE]
-> **No `--json` flag.** CLI output should be human-readable for transparency. Structured capture happens via the response file.
+**Timeout strategy for external CLI agents:**
+
+1. **Record the start time** when the command is dispatched.
+2. **Poll at 30s intervals** via `command_status(WaitDurationSeconds: 30)`.
+3. **On each poll**, check:
+   - If the command has **completed** (status = done) → proceed to Step 3 (Error Detection).
+   - If the command is **still running**, check elapsed wall-clock time:
+     - **Under 10 minutes**: keep polling. Silence is expected.
+     - **Over 10 minutes**: `send_command_input(Terminate=true)` → count as a failed attempt.
+4. **If output appears at any point** (even partial), reset the timeout clock — the agent is actively producing.
 
 ---
 
