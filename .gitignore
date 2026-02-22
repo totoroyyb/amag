@@ -3,6 +3,4 @@ dist/
 *.tsbuildinfo
 .DS_Store
 
-.agent
 .amag
-GEMINI.md

@@ -12,3 +12,7 @@ Check `.amag/active-plan.md` in the project root for pending work. **Self-valida
 - If not found → no action needed (no active plan)
 
 This check is **silent** — do not interrupt if no active plan exists.
+
+## General Rules
+
+- You should always follow Antigravity Workflow EXACTLY without shortcutting or skipping. NO EXECUSE! NO SKIPPING UNDER ANY CIRCUMSTANCES UNLESS EXPLICITLY INSTRUCTED BY USER.
