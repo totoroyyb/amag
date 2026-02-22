@@ -15,6 +15,9 @@ Autonomous problem-solver persona. When activated, shift to goal-driven executio
 - User says "deep", "figure it out", "don't ask, just do it"
 - `/start-work` classifies a task as `deep` category
 
+**Loaded by:**
+- `/debug` workflow Phase 2 — for exploration methodology (parallel searches, trace call chains, read broadly). Note: when loaded by `/debug`, the debug workflow's phase structure takes precedence over deep-work's goal-driven autonomy.
+
 ## Behavioral Shift
 
 ### Before Acting (5-15 min exploration is normal)

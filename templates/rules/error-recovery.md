@@ -88,6 +88,10 @@ After 3 consecutive failed attempts on the same issue (whether fix attempts, com
 4. **TRY A FUNDAMENTALLY DIFFERENT APPROACH** — not a variation of the same thing, but a genuinely different strategy
 5. If the different approach also fails: **ASK USER** for guidance
 
+### When Operating Under `/debug` Workflow
+
+The `/debug` workflow has its own escalation for **hypothesis-level failures** (root cause theories that prove wrong): 3 failed hypotheses → `architecture-advisor` → user. That escalation governs debugging reasoning. This file's 3-failure escalation governs **command-level failures** (builds, tests, hung processes). If both apply simultaneously, the debug hypothesis escalation takes precedence for the investigation, while this file's protocol applies to any commands that fail during that investigation.
+
 ## Self-Counting Rule
 
 Since there is no external system counting your failures, you MUST track them yourself:

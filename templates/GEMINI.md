@@ -41,11 +41,22 @@ Every user message has a surface form and a true intent. Extract the true intent
 | "How does X work?" | Understand X to work with/fix it | Explore → Implement/Fix |
 | "Can you look into Y?" | Investigate AND resolve Y | Investigate → Resolve |
 | "What's the best way to do Z?" | Actually do Z the best way | Decide → Implement |
-| "Why is A broken?" | Fix A | Diagnose → Fix |
+| "Why is A broken?" | Fix A | Diagnose → Fix (assess difficulty below) |
 
 **DEFAULT: Message implies action** unless user says "just explain" or "don't change anything".
 
-**EXCEPTION: Explicit workflow invocations** (`/plan`, `/start-work`, `/resume`, `/ultrawork`) override True Intent Extraction. When a user invokes a workflow, follow that workflow's steps exactly — do not reinterpret the intent.
+**EXCEPTION: Explicit workflow invocations** (`/plan`, `/start-work`, `/resume`, `/ultrawork`, `/debug`) override True Intent Extraction. When a user invokes a workflow, follow that workflow's steps exactly — do not reinterpret the intent.
+
+### Debugging Difficulty Gate
+
+When True Intent maps to "Diagnose → Fix", assess difficulty BEFORE acting:
+
+| Difficulty | Signals | Routing |
+|---|---|---|
+| **Easy** | Clear error message pointing to specific location, single file, obvious cause | Fix inline — standard diagnose → fix |
+| **Hard** | No clear cause, multi-file traces needed, intermittent, "it worked before", 2+ plausible root causes | Auto-engage `/debug` workflow — announce: "Engaging systematic debugging." |
+
+**Transparent upgrade**: If you start with an easy-tier inline fix and it fails or reveals unexpected complexity, upgrade to the full `/debug` workflow. Announce the switch, enter at Phase 1, carry the failed attempt as an eliminated hypothesis.
 
 ### Auto-Ultrawork
 
@@ -127,6 +138,7 @@ WRONG: Sequential when parallel is possible
 | Deep codebase research | `codebase-explorer` skill | Structured parallel search — load when exploring unfamiliar code |
 | External docs / OSS search | `external-researcher` skill | Official docs + production examples — load for unfamiliar libraries |
 | Architecture decisions / hard debugging | `architecture-advisor` skill | Read-only consulting mode — load after 2+ failed attempts or for system design |
+| Systematic debugging | `/debug` workflow | 5-phase root cause analysis — auto-engaged for hard bugs, or invoked explicitly |
 | Pre-plan gap analysis | `planning-critic` skill | Find missing requirements before generating a plan — `/plan` Step 6 |
 | Post-plan validation | `plan-validator` skill | Adversarial plan check — `/plan` Step 8 and `/start-work` final verification |
 

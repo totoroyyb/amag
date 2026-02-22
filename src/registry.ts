@@ -58,6 +58,11 @@ export const COMPONENTS: Component[] = [
         name: "resume",
         description: "/resume — Cross-session resume from .amag/active-plan.md with self-validation",
     },
+    {
+        type: "workflow",
+        name: "debug",
+        description: "/debug — Systematic 5-phase debugging: reproduce, hypothesize, instrument, root-cause, fix",
+    },
 
     // Skills (on-demand expertise)
     {
