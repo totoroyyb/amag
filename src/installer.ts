@@ -58,6 +58,35 @@ async function installComponent(
     }
 }
 
+async function copyResources(
+    templatesDir: string,
+    projectDir: string,
+    options?: { force?: boolean }
+): Promise<{ updated: number; created: number }> {
+    const srcDir = path.join(templatesDir, "resources");
+    const destDir = path.join(projectDir, ".agent", "resources");
+    let updated = 0;
+    let created = 0;
+
+    if (!(await fs.pathExists(srcDir))) return { updated, created };
+
+    await fs.ensureDir(destDir);
+    for (const file of await fs.readdir(srcDir)) {
+        if (!file.endsWith(".md")) continue;
+        const dest = path.join(destDir, file);
+        const existed = await fs.pathExists(dest);
+        await copyTemplate(
+            path.join(srcDir, file),
+            dest,
+            `resource/${file}`,
+            options
+        );
+        if (existed) updated++;
+        else created++;
+    }
+    return { updated, created };
+}
+
 async function findExistingComponents(projectDir: string): Promise<string[]> {
     const existing: string[] = [];
     for (const comp of COMPONENTS) {
@@ -112,6 +141,9 @@ export async function initCommand(
         await installComponent(comp, templatesDir, projectDir, { force: options.force });
     }
 
+    // Copy resource files (e.g., plan-template.md)
+    await copyResources(templatesDir, projectDir, { force: options.force });
+
     // Generate GEMINI.md at project root
     if (!options.skipGeminiMd) {
         await copyTemplate(
@@ -155,6 +187,11 @@ export async function updateCommand(
         if (existed) updated++;
         else created++;
     }
+
+    // Copy resource files
+    const resourceResult = await copyResources(templatesDir, projectDir, { force: true });
+    updated += resourceResult.updated;
+    created += resourceResult.created;
 
     if (!options.skipGeminiMd) {
         const geminiPath = path.join(projectDir, "GEMINI.md");
@@ -267,6 +304,14 @@ export async function uninstallCommand(
     );
     if (configRemoved) removed++;
     else absent++;
+
+    // Remove resource files
+    const resourcesDir = path.join(projectDir, ".agent", "resources");
+    if (await fs.pathExists(resourcesDir)) {
+        const wasRemoved = await removeIfExists(resourcesDir, ".agent/resources");
+        if (wasRemoved) removed++;
+        else absent++;
+    }
 
     // Clean .amag directory if empty
     await cleanEmptyDirs(path.join(projectDir, ".amag"), projectDir);

@@ -143,7 +143,7 @@ If no verdict → re-run or fall back to self-review.
 
 ## Step 7: Generate Plan
 
-Follow the template in `.agent/workflows/plan-template.md` exactly. Create `implementation_plan.md` artifact using that structure.
+Follow the template in `.agent/resources/plan-template.md` exactly. Create `implementation_plan.md` artifact using that structure.
 
 ### Plan Quality Standards
 
