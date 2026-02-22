@@ -253,6 +253,26 @@ Either path runs through all six gap categories:
 
 Review files are written to `.amag/reviews/` for auditability.
 
+### Mandatory Completion Gate (BLOCKING)
+
+After the skill completes, **verify both files exist** before proceeding:
+
+```
+run_command: test -f .amag/reviews/{planId}-consultant-request.md && test -f .amag/reviews/{planId}-consultant-response.md && echo "GATE PASS" || echo "GATE FAIL"
+```
+
+If `GATE FAIL`:
+- The consultant step was silently skipped or failed to persist output
+- **Do NOT proceed to Step 7.** Re-run the consultant skill from Step 1
+- If it fails again → fall back to self-review path explicitly
+
+Then verify the response contains a verdict:
+```
+grep_search("verdict:", ".amag/reviews/{planId}-consultant-response.md")
+```
+
+If no verdict found → the response is malformed. Re-run or fall back to self-review.
+
 **Handle gaps:**
 - **CRITICAL** (requires user input) → surface via `notify_user` → wait for answer → re-run clearance check → re-run gap review → then generate plan
 - **MINOR** (self-resolvable) → fix silently, note in plan summary
@@ -435,7 +455,7 @@ After generating the plan, present the user a choice via `notify_user`:
 >
 > - **Option A — Start Work**: Plan looks solid, proceed with `/start-work`.
 >
-> - **Option B — Critical Review Pass**: Activate `plan-critic` skill for independent review. If a CLI agent is configured (codex/claude-code), it will provide an external perspective. Otherwise, enhanced self-review."
+> - **Option B — Critical Review Pass**: Activate `plan-critic` skill for independent review. If a CLI agent is configured (codex/claude), it will provide an external perspective. Otherwise, enhanced self-review."
 
 **If Option B selected:**
 1. Load `plan-critic` skill

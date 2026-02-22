@@ -4,11 +4,14 @@ import { resolveProjectDir, log } from "./utils.js";
 
 // --- Types ---
 
-export type ReviewCLI = "codex" | "claude-code" | "gemini-cli";
+export type ReviewCLI = "codex" | "claude" | "gemini-cli";
+
+export type ThinkingLevel = "max" | "high" | "medium" | "low" | "none";
 
 export interface ReviewRoleConfig {
     cli: ReviewCLI | null;
     model: string | null;
+    thinking: ThinkingLevel;
 }
 
 export interface ReviewConfig {
@@ -25,8 +28,8 @@ export interface AmagConfig {
 
 const DEFAULT_CONFIG: AmagConfig = {
     review: {
-        consultant: { cli: "claude-code", model: "claude-opus-4-6" },
-        critic: { cli: "codex", model: "gpt-5.2" },
+        consultant: { cli: "claude", model: "claude-opus-4-6", thinking: "max" },
+        critic: { cli: "codex", model: "gpt-5.2", thinking: "medium" },
         timeout_ms: 120000,
     },
 };

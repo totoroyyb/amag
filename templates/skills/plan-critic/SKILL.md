@@ -45,7 +45,9 @@ This ensures the user is never silently downgraded from independent CLI review t
 
 ### 1. Write Review Request
 
-Write the request via `write_to_file` to `.amag/reviews/{planId}-critic-request.md`:
+Write the request via `write_to_file` to `.amag/reviews/{planId}-critic-request.md`.
+
+**Inline the full plan content as a baseline.** The request should contain the complete `implementation_plan.md` and key referenced file contents. However, external CLIs **can and should read additional files** from the codebase to verify references. The hard constraint is on **command execution**, not file reading.
 
 ```markdown
 ---
@@ -55,31 +57,26 @@ plan_id: {planId}
 created: {timestamp}
 ---
 
-## Your Role: Plan Critic
+# SYSTEM
 
-You are a practical plan reviewer. Your goal: verify the plan is
-EXECUTABLE and REFERENCES ARE VALID.
+You are a Plan Critic in the AMAG agent protocol system.
+You are a practical, experienced engineer with approval bias.
+Your job is fast, focused verification — not perfectionism.
 
-You answer ONE question: "Can a developer execute this without getting stuck?"
+You answer ONE question: "Can a developer execute this plan without getting stuck?"
 
-## What You ARE Here To Do
-- Verify referenced files exist and contain what's claimed
-- Ensure tasks have enough context to START working
-- Catch BLOCKING issues only (things that completely stop work)
+## Hard Constraints
 
-## What You Are NOT Here To Do
-- Nitpick every detail
-- Question the approach or architecture choices
-- Demand perfection
-- Find as many issues as possible
-- Force multiple revision cycles
-
-**APPROVAL BIAS: When in doubt, APPROVE.**
+- **ANALYSIS ONLY.** You do NOT implement, do NOT modify files, do NOT run shell commands.
+- **NO COMMAND EXECUTION.** Do not run builds, tests, scripts, or any shell commands. Commands may fail in sandboxed environments. You CAN read files from the codebase to verify references and deepen your analysis.
+- **Follow the response format exactly.** The planner parses your output programmatically.
+- **No AI slop.** No "delve", "leverage", "comprehensive", "robust". Direct statements only.
+- **Max 3 blocking issues.** If you find more, pick the 3 most critical. Everything else is a warning.
 
 ## What You Check (ONLY THESE)
 
 ### 1. Reference Verification (CRITICAL)
-- Do referenced files exist?
+- Do referenced files exist based on the file contents provided below?
 - Do referenced line numbers contain relevant code?
 - If "follow pattern in X" is mentioned, does X demonstrate that pattern?
 - PASS even if reference isn't perfect (developer can explore from there)
@@ -108,12 +105,22 @@ You answer ONE question: "Can a developer execute this without getting stuck?"
 ❌ Listing more than 3 issues — pick top 3 most critical
 ❌ Rejecting because you'd do it differently — NEVER
 
+**APPROVAL BIAS: When in doubt, APPROVE.**
+
+---
+
 ## Plan Content
 
 {full implementation_plan.md content}
 
+## Referenced File Contents (Baseline)
+{paste key file contents that are referenced in the plan — the reviewer may also read additional files from the codebase to verify other references}
+
+---
+
 ## Response Format (MUST follow exactly)
 
+```
 ---
 verdict: APPROVE | REVISE | REJECT
 ---
@@ -129,31 +136,56 @@ verdict: APPROVE | REVISE | REJECT
 ## Warnings (optional, non-blocking)
 - [Warning detail]
 ```
+```
 
 ### 2. Spawn CLI Agent
 
-Read model from config (default: `gpt-5.2`). Spawn via `run_command`:
+Read model and thinking level from config (defaults: `gpt-5.2`, thinking: `medium`). Spawn via `run_command`.
 
 **For codex (default for critic):**
 ```
-run_command: echo "$(cat .amag/reviews/{planId}-critic-request.md)" | codex exec --full-auto --json -m gpt-5.2
+run_command: codex exec --full-auto -m {model} -c model_reasoning_effort="{thinking_mapped}" -o .amag/reviews/{planId}-critic-response-raw.md < .amag/reviews/{planId}-critic-request.md
 ```
 
-**For claude-code:**
+If `-o` flag is not available on the installed version, fall back to stdout redirect:
 ```
-run_command: claude --print --model claude-opus-4-6 --max-turns 1 --dangerously-skip-permissions < .amag/reviews/{planId}-critic-request.md
+run_command: codex exec --full-auto -m {model} -c model_reasoning_effort="{thinking_mapped}" < .amag/reviews/{planId}-critic-request.md > .amag/reviews/{planId}-critic-response-raw.md 2>&1
+```
+
+**For claude:**
+```
+run_command: claude --print --model {model} --effort {thinking_mapped} --dangerously-skip-permissions < .amag/reviews/{planId}-critic-request.md > .amag/reviews/{planId}-critic-response-raw.md 2>&1
 ```
 
 **For gemini-cli:**
 ```
-run_command: cat .amag/reviews/{planId}-critic-request.md | gemini --yolo
+run_command: cat .amag/reviews/{planId}-critic-request.md | gemini --yolo > .amag/reviews/{planId}-critic-response-raw.md 2>&1
 ```
+
+**Thinking level mapping** (read from `review.critic.thinking` in config):
+
+| Config value | claude `--effort` | codex `-c model_reasoning_effort` | gemini behavior |
+|---|---|---|---|
+| `max` | `high` | `high` | Default |
+| `high` | `high` | `high` | Default |
+| `medium` | `medium` | `medium` | Default |
+| `low` | `low` | `low` | Default |
+| `none` | `low` | `low` | Default |
 
 Set `WaitMsBeforeAsync: 500`. Poll via `command_status` at 60s intervals. Timeout: kill via `send_command_input(Terminate=true)` → fall back to Self-Review Path (Step 2B).
 
+> [!NOTE]
+> **No `--json` flag.** CLI output should be human-readable in the terminal for transparency. Structured capture happens via the response file, not JSON parsing.
+
 ### 3. Parse Response
 
-Read CLI output. Write parsed response to `.amag/reviews/{planId}-critic-response.md`. Proceed to **Step 3: Act on Verdict**.
+If a raw response file was produced (`.amag/reviews/{planId}-critic-response-raw.md`), read it via `view_file`. If the CLI wrote to stdout instead, read from `command_status` output.
+
+Clean up the raw output — strip ANSI codes, CLI chrome, or wrapper formatting — and write the final parsed response to `.amag/reviews/{planId}-critic-response.md` via `write_to_file`.
+
+Verify the response contains the required `verdict:` line. If missing or malformed → fall back to Self-Review Path (Step 2B).
+
+Proceed to **Step 3: Act on Verdict**.
 
 ## Step 2B: Self-Review Path
 

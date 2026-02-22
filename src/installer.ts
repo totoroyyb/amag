@@ -69,6 +69,9 @@ async function findExistingComponents(projectDir: string): Promise<string[]> {
     if (await fs.pathExists(path.join(projectDir, "GEMINI.md"))) {
         existing.push("GEMINI.md");
     }
+    if (await fs.pathExists(path.join(projectDir, ".amag", "config.json"))) {
+        existing.push(".amag/config.json");
+    }
     return existing;
 }
 
@@ -119,6 +122,16 @@ export async function initCommand(
         );
     }
 
+    // Generate default .amag/config.json
+    const configPath = path.join(projectDir, ".amag", "config.json");
+    if (options.force || !(await fs.pathExists(configPath))) {
+        const { writeConfig, getDefaultConfig } = await import("./config.js");
+        await writeConfig(targetDir, getDefaultConfig());
+        log.success(".amag/config.json");
+    } else {
+        log.warn(".amag/config.json (exists, skipped)");
+    }
+
     log.success("\nDone! AMAG is installed.");
     log.info("Run `amag doctor` to verify installation.");
 }
@@ -154,6 +167,22 @@ export async function updateCommand(
         );
         if (existed) updated++;
         else created++;
+    }
+
+    // Update .amag/config.json — merge with defaults to pick up new fields
+    const configFilePath = path.join(projectDir, ".amag", "config.json");
+    const { readConfig, writeConfig } = await import("./config.js");
+    if (await fs.pathExists(configFilePath)) {
+        // Re-read merges user overrides with latest defaults (picks up new fields)
+        const merged = await readConfig(targetDir);
+        await writeConfig(targetDir, merged);
+        log.success(".amag/config.json (merged with latest defaults)");
+        updated++;
+    } else {
+        const { getDefaultConfig } = await import("./config.js");
+        await writeConfig(targetDir, getDefaultConfig());
+        log.success(".amag/config.json (created)");
+        created++;
     }
 
     console.log();
@@ -230,6 +259,17 @@ export async function uninstallCommand(
         if (wasRemoved) removed++;
         else absent++;
     }
+
+    // Remove .amag/config.json
+    const configRemoved = await removeIfExists(
+        path.join(projectDir, ".amag", "config.json"),
+        ".amag/config.json"
+    );
+    if (configRemoved) removed++;
+    else absent++;
+
+    // Clean .amag directory if empty
+    await cleanEmptyDirs(path.join(projectDir, ".amag"), projectDir);
 
     console.log();
     log.success(`Done! ${removed} removed, ${absent} already absent.`);

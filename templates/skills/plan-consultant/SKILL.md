@@ -46,7 +46,9 @@ When a CLI agent is available, delegate the review for an independent perspectiv
 
 ### 1. Write Review Request
 
-Write the request file via `write_to_file` to `.amag/reviews/{planId}-consultant-request.md`:
+Write the request file via `write_to_file` to `.amag/reviews/{planId}-consultant-request.md`.
+
+**Inline key context as a baseline.** The request should contain enough information for the reviewer to understand the task without filesystem access (user's goal, interview transcript, research findings, key file contents). However, external CLIs **can and should read additional files** from the codebase for deeper analysis. The hard constraint is on **command execution**, not file reading.
 
 ```markdown
 ---
@@ -56,14 +58,26 @@ plan_id: {planId}
 created: {timestamp}
 ---
 
-## Your Role: Plan Consultant
+# SYSTEM
 
-You are a pre-planning consultant. Analyze this request BEFORE the plan
-is written to prevent AI failures.
+You are a Plan Consultant in the AMAG agent protocol system.
+You operate under maximum rigor — thorough analysis, zero shortcuts.
+You are a disciplined senior engineer who catches what others miss.
 
-CONSTRAINTS:
-- READ-ONLY: You analyze, question, advise. You do NOT implement.
-- Your output feeds into the planner. Be actionable, not vague.
+Your output feeds directly into the planner. Be precise, actionable,
+and ruthlessly honest. No flattery, no filler, no hedging.
+
+## Hard Constraints
+
+- **ANALYSIS ONLY.** You do NOT implement, do NOT modify files, do NOT run shell commands.
+- **NO COMMAND EXECUTION.** Do not run builds, tests, scripts, or any shell commands. Commands may fail in sandboxed environments. You CAN read files from the codebase to deepen your analysis.
+- **Follow the response format exactly.** The planner parses your output programmatically.
+- **No AI slop.** No "delve", "leverage", "comprehensive", "robust". Plain words, direct statements.
+
+## Your Job
+
+Analyze this request BEFORE the plan is written. Surface gaps that would
+cause the plan to fail, be incomplete, or produce AI-slop output.
 
 ## Phase 0: Intent Classification (MANDATORY FIRST STEP)
 
@@ -89,6 +103,8 @@ Classify the work intent:
 5. Guardrails (explicit MUST NOT items)
 6. Missing acceptance criteria — all criteria must be agent-executable
 
+---
+
 ## User's Goal
 {summarize what user wants}
 
@@ -101,8 +117,14 @@ Classify the work intent:
 ## Research Findings
 {discoveries from codebase exploration}
 
+## Relevant File Contents (Baseline)
+{paste key file contents that provide essential context — the reviewer may also read additional files from the codebase for deeper analysis}
+
+---
+
 ## Response Format (MUST follow exactly)
 
+```
 ---
 verdict: APPROVE | REVISE
 ---
@@ -125,31 +147,56 @@ verdict: APPROVE | REVISE
 ## AI-Slop Warnings
 - [Detected pattern]: [How to avoid]
 ```
+```
 
 ### 2. Spawn CLI Agent
 
-Read model from config (default: `claude-opus-4-6`). Spawn via `run_command`:
+Read model and thinking level from config (defaults: `claude-opus-4-6`, thinking: `max`). Spawn via `run_command`.
 
-**For claude-code:**
+**For claude:**
 ```
-run_command: claude --print --model claude-opus-4-6 --max-turns 1 --dangerously-skip-permissions < .amag/reviews/{planId}-consultant-request.md
+run_command: claude --print --model {model} --effort {thinking_mapped} --dangerously-skip-permissions < .amag/reviews/{planId}-consultant-request.md > .amag/reviews/{planId}-consultant-response-raw.md 2>&1
 ```
 
 **For codex:**
 ```
-run_command: echo "$(cat .amag/reviews/{planId}-consultant-request.md)" | codex exec --full-auto --json -m gpt-5.2
+run_command: codex exec --full-auto -m {model} -c model_reasoning_effort="{thinking_mapped}" -o .amag/reviews/{planId}-consultant-response-raw.md < .amag/reviews/{planId}-consultant-request.md
+```
+
+If `-o` flag is not available on the installed version, fall back to stdout redirect:
+```
+run_command: codex exec --full-auto -m {model} -c model_reasoning_effort="{thinking_mapped}" < .amag/reviews/{planId}-consultant-request.md > .amag/reviews/{planId}-consultant-response-raw.md 2>&1
 ```
 
 **For gemini-cli:**
 ```
-run_command: cat .amag/reviews/{planId}-consultant-request.md | gemini --yolo
+run_command: cat .amag/reviews/{planId}-consultant-request.md | gemini --yolo > .amag/reviews/{planId}-consultant-response-raw.md 2>&1
 ```
+
+**Thinking level mapping** (read from `review.consultant.thinking` in config):
+
+| Config value | claude `--effort` | codex `-c model_reasoning_effort` | gemini behavior |
+|---|---|---|---|
+| `max` | `high` | `high` | Default |
+| `high` | `high` | `high` | Default |
+| `medium` | `medium` | `medium` | Default |
+| `low` | `low` | `low` | Default |
+| `none` | `low` | `low` | Default |
 
 Set `WaitMsBeforeAsync: 500` to run async. Poll via `command_status` at 60s intervals. If no progress for 2 polls → `send_command_input(Terminate=true)` → fall back to Self-Review Path (Step 2B).
 
+> [!NOTE]
+> **No `--json` flag.** CLI output should be human-readable in the terminal for transparency. Structured capture happens via the response file, not JSON parsing.
+
 ### 3. Parse Response
 
-Read CLI output. Write parsed response to `.amag/reviews/{planId}-consultant-response.md` via `write_to_file`. Proceed to **Step 3: Act on Verdict**.
+If a raw response file was produced (`.amag/reviews/{planId}-consultant-response-raw.md`), read it via `view_file`. If the CLI wrote to stdout instead, read from `command_status` output.
+
+Clean up the raw output — strip ANSI codes, CLI chrome, or wrapper formatting — and write the final parsed response to `.amag/reviews/{planId}-consultant-response.md` via `write_to_file`.
+
+Verify the response contains the required `verdict:` line. If missing or malformed → fall back to Self-Review Path (Step 2B).
+
+Proceed to **Step 3: Act on Verdict**.
 
 ## Step 2B: Self-Review Path
 
@@ -205,7 +252,7 @@ For each gap found, classify it:
 ```
 ## Plan Consultant Analysis
 
-**Backend**: [cli: claude-code | self-review]
+**Backend**: [cli: claude | self-review]
 
 **CRITICAL gaps (need user input before generating plan):**
 - [Gap description]: [Specific question to ask]

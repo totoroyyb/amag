@@ -96,6 +96,16 @@ export async function doctorCheck(targetDir: string): Promise<void> {
         missing++;
     }
 
+    // Check .amag/config.json
+    const configJsonPath = path.join(projectDir, ".amag", "config.json");
+    if (await fs.pathExists(configJsonPath)) {
+        log.success(".amag/config.json");
+        installed++;
+    } else {
+        log.warn(".amag/config.json — not installed");
+        missing++;
+    }
+
     // Check each component
     for (const comp of COMPONENTS) {
         const destDir = path.join(projectDir, DEST_MAP[comp.type]);
@@ -119,7 +129,7 @@ export async function doctorCheck(targetDir: string): Promise<void> {
     console.log();
     console.log(
         chalk.bold(
-            `${installed} installed, ${missing} missing out of ${COMPONENTS.length + 1} components`
+            `${installed} installed, ${missing} missing out of ${COMPONENTS.length + 2} components`
         )
     );
 
