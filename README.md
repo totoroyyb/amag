@@ -7,14 +7,11 @@ Inspired by [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) —
 ## Quick Start
 
 ```bash
-npm install -g @totoroyyb/amag
-
-# Initialize in your project
 cd /path/to/your/project
-amag init
+npx @totoroyyb/amag init
 ```
 
-Or install from source:
+Or build from source:
 
 ```bash
 git clone https://github.com/totoroyyb/amag.git
@@ -107,11 +104,11 @@ Agent: [structural scan → module deep-dives → synthesizes architecture doc]
 AMAG can delegate to external CLI agents (Claude, Codex, Gemini) for plan review and debugging consultation. Configure via:
 
 ```bash
-amag config show                              # View current config
-amag config set review.consultant.cli claude   # Set plan consultant
-amag config set debug.consultant.cli codex     # Set debug consultant
-amag config set review.critic.thinking high    # Set thinking level
-amag config reset                              # Reset to defaults
+npx @totoroyyb/amag config show                              # View current config
+npx @totoroyyb/amag config set review.consultant.cli claude   # Set plan consultant
+npx @totoroyyb/amag config set debug.consultant.cli codex     # Set debug consultant
+npx @totoroyyb/amag config set review.critic.thinking high    # Set thinking level
+npx @totoroyyb/amag config reset                              # Reset to defaults
 ```
 
 Thinking levels: `max`, `high`, `medium`, `low`, `none`.
@@ -119,14 +116,14 @@ Thinking levels: `max`, `high`, `medium`, `low`, `none`.
 ## CLI Reference
 
 ```bash
-amag init                    # Install all components
-amag update                  # Overwrite with latest templates
-amag add <type> <name>       # Install one component (rule, workflow, skill)
-amag remove <type> <name>    # Remove one component
-amag uninstall               # Remove all AMAG files
-amag list                    # Show available components
-amag doctor                  # Check installation status
-amag config show|set|reset   # Manage configuration
+npx @totoroyyb/amag init                    # Install all components
+npx @totoroyyb/amag update                  # Overwrite with latest templates
+npx @totoroyyb/amag add <type> <name>       # Install one component (rule, workflow, skill)
+npx @totoroyyb/amag remove <type> <name>    # Remove one component
+npx @totoroyyb/amag uninstall               # Remove all AMAG files
+npx @totoroyyb/amag list                    # Show available components
+npx @totoroyyb/amag doctor                  # Check installation status
+npx @totoroyyb/amag config show|set|reset   # Manage configuration
 ```
 
 ## Design Philosophy
