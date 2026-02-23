@@ -134,9 +134,9 @@ External agent features require the corresponding CLI tools to be installed and 
 
 | CLI | Install | Auth |
 |-----|---------|------|
-| [Claude CLI](https://docs.anthropic.com/en/docs/claude-cli) | `npm install -g @anthropic-ai/claude-code` | `claude login` |
+| [Claude Code](https://code.claude.com/docs/en/overview) | `curl -fsSL https://claude.ai/install.sh | bash` | You might need to login with `claude` CLI first |
 | [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | `codex login` |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `npm install -g @anthropic-ai/gemini-cli` | `gemini login` |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `npm install -g @google/gemini-cli` | You might need to login with `gemini` CLI first |
 
 If no external CLI is configured or available, AMAG falls back to native single-agent review — everything still works, just without the multi-model perspective.
 
