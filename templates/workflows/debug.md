@@ -30,6 +30,8 @@ Call `task_boundary` at **every phase transition** with:
 | Intent gate classifies a bug as HARD (see `GEMINI.md` difficulty gate) | Phase 1 |
 | Transparent upgrade — inline fix failed, revealed deeper issue | Phase 2 (carry failed attempt as eliminated hypothesis) |
 | User says "debug", "trace this bug", "find the root cause" | Phase 1 |
+| User says `/debug-escalate` | Escalation → External CLI (immediate) |
+| User says "consult external", "ask codex", "ask claude", "get second opinion" | Escalation → External CLI (immediate) |
 
 **Do NOT use for**: typos/one-line fixes (just fix directly), build config issues (`error-recovery.md`), feature requests disguised as bugs.
 
@@ -95,6 +97,46 @@ For each hypothesis:
 **Change ONE variable at a time.** If you change two things, you learn nothing.
 
 **Output**: The confirmed root cause with evidence. You must be able to explain WHY the bug exists, not just WHERE.
+
+## Deep Analysis Checkpoint (after Phase 3)
+
+After presenting your confirmed root cause, **pause and offer the user a choice** via `notify_user` with `BlockedOnUser: true`:
+
+```
+## Root Cause Found
+
+**Root Cause**: {your confirmed root cause with evidence}
+
+---
+
+### How would you like to proceed?
+
+**Option A** — Proceed to fix (default)
+Continue to Pattern Analysis → Fix → Verification.
+
+**Option B** — Deep analysis from a second opinion
+Consult {agent_label} for a structural review before fixing.
+```
+
+**Determining `{agent_label}`**: Read `.amag/config.json` → `debug.consultant.cli`:
+- If `cli` is set (e.g. `codex`, `claude`) → label: "external agent (`{cli}` / `{model}`)"
+- If `cli` is null → label: "architecture-advisor (native deep analysis)"
+
+**If user picks Option A** (or doesn't respond with a clear choice): continue to Phase 4.
+
+**If user picks Option B**:
+1. If `debug.consultant.cli` is configured:
+   - Write request to `.amag/reviews/debug-{timestamp}-deepanalysis-request.md` using template in `.agent/resources/debug-escalation-template.md`
+   - Load `external-cli-runner` skill. Invoke with:
+     - **configPath**: `debug.consultant`
+     - **requestFile**: `.amag/reviews/debug-{timestamp}-deepanalysis-request.md`
+     - **responseFileRaw**: `.amag/reviews/debug-{timestamp}-deepanalysis-response-raw.md`
+     - **responseFile**: `.amag/reviews/debug-{timestamp}-deepanalysis-response.md`
+     - **requiredField**: `## Recommendation`
+     - **fallbackAction**: "Fall back to architecture-advisor (native)"
+2. If `debug.consultant.cli` is null (or external CLI failed):
+   - Load `architecture-advisor` skill — perform native deep analysis
+3. Present findings to user, then continue to Phase 4 with the analysis incorporated
 
 ## Phase 4 — Pattern Analysis
 <!-- task_boundary: TaskStatus="Phase 4/6: Analyzing patterns against working code" -->
@@ -163,7 +205,33 @@ In your final report to the user, include:
 
 ## Escalation
 
-### Hypothesis-Level Escalation
+> [!IMPORTANT]
+> **User override**: If the user explicitly requests external help at any point during `/debug` — via `/debug-escalate`, keyword triggers ("consult external", "ask codex", "ask claude", "get second opinion"), or any clear request — skip the 3-hypothesis gate and proceed directly to External CLI Consultation below.
+
+### User-Triggered Escalation
+
+These triggers give the user immediate access to external consultation without waiting for automatic escalation:
+
+| Trigger | Action |
+|---|---|
+| `/debug-escalate` | Immediately invoke external CLI consultation |
+| "consult external", "ask codex", "ask claude", "get second opinion" | Same as `/debug-escalate` |
+| User explicitly asks for external help (any phrasing) | Same as `/debug-escalate` |
+
+When triggered:
+1. Collect current debug context: symptom, bug type, any hypotheses tested/eliminated so far, reproduction info
+2. Write request to `.amag/reviews/debug-{timestamp}-request.md` using template in `.agent/resources/debug-escalation-template.md` (read it via `view_file`)
+3. Load `external-cli-runner` skill. Invoke with:
+   - **configPath**: `debug.consultant`
+   - **requestFile**: `.amag/reviews/debug-{timestamp}-request.md`
+   - **responseFileRaw**: `.amag/reviews/debug-{timestamp}-response-raw.md`
+   - **responseFile**: `.amag/reviews/debug-{timestamp}-response.md`
+   - **requiredField**: `## Recommendation`
+   - **fallbackAction**: "Skip external consultation — report findings to user"
+4. **If success**: present recommendation to user, then apply and re-attempt fix from Phase 5
+5. **If failure**: report to user with all context gathered so far
+
+### Automatic Hypothesis-Level Escalation
 
 After **3 failed hypotheses** (3 root cause theories tested and eliminated):
 
@@ -171,16 +239,7 @@ After **3 failed hypotheses** (3 root cause theories tested and eliminated):
 2. **Load `architecture-advisor` skill** — shift to read-only consulting mode
 3. **Document** eliminated hypotheses: `Hypothesis N: [claim] → ELIMINATED because [evidence]`
 4. In advisor mode: re-examine from a structural/architectural angle
-5. **If advisor cannot resolve** → attempt external CLI consultation:
-   - Update `task_boundary`: `TaskStatus: "Escalation: consulting external debug agent..."`
-   - Write request to `.amag/reviews/debug-{timestamp}-request.md` using template in `.agent/resources/debug-escalation-template.md` (read it via `view_file`)
-   - **Load `external-cli-runner` skill.** Invoke with:
-     - **configPath**: `debug.consultant`
-     - **requestFile**: `.amag/reviews/debug-{timestamp}-request.md`
-     - **responseFileRaw**: `.amag/reviews/debug-{timestamp}-response-raw.md`
-     - **responseFile**: `.amag/reviews/debug-{timestamp}-response.md`
-     - **requiredField**: `## Recommendation`
-     - **fallbackAction**: "Skip external consultation — proceed to ASK USER"
+5. **If advisor cannot resolve** → attempt external CLI consultation (same procedure as User-Triggered Escalation above)
    - **If success**: apply recommendation, re-attempt fix from Phase 5. If still fails → ASK USER
    - **If failure** (CLI not found / 3 retries exhausted) → ASK USER
 6. **ASK USER** with full context — include eliminated hypotheses, advisor analysis, and CLI recommendation (if available)

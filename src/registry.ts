@@ -65,6 +65,11 @@ export const COMPONENTS: Component[] = [
     },
     {
         type: "workflow",
+        name: "debug-escalate",
+        description: "/debug-escalate — Immediately escalate to external CLI consultation during an active /debug session",
+    },
+    {
+        type: "workflow",
         name: "explore",
         description: "/explore — Read-only multi-phase codebase exploration: structural scan, module deep-dives, synthesis",
     },
