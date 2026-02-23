@@ -6,7 +6,9 @@ description: Systematic debugging — reproduce first, trace root cause, fix sur
 
 Engage systematic debugging mode. No guessing. No shotgun fixes. Trace the root cause, prove it, fix it once.
 
-**MANDATORY**: Say "SYSTEMATIC DEBUG MODE" to the user when this activates.
+**MANDATORY**: Announce to the user:
+
+> **🔍 SYSTEMATIC DEBUG MODE**
 
 **Auto-Ultrawork rigor applies during `/debug`**, but "100% certainty before acting" is relaxed — debugging's hypothesis-iterate loop is inherently uncertain. The debug workflow's phase structure governs the investigation; ultrawork provides base-level thoroughness.
 
@@ -150,8 +152,12 @@ The bug you just fixed may exist elsewhere:
 In your final report to the user, include:
 
 ```
+## Debug Report
+
 **Root Cause**: [What was actually wrong and why]
+
 **Fix**: [What was changed to address it]
+
 **Systemic Risk**: [Whether the same pattern exists elsewhere — yes/no + locations]
 ```
 

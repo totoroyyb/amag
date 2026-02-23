@@ -93,18 +93,19 @@ Ask via `notify_user`. One question per turn — each answer informs the next.
 ## Step 4: Self-Clearance Check
 <!-- task_boundary: TaskStatus="Step 5/10: Running self-clearance check" -->
 
-**Run after EVERY interview turn:**
+**Run after EVERY interview turn.** Check these internally — do NOT present the raw checklist to the user:
 
-```
-□ Core objective clearly defined?
-□ Scope boundaries — IN and OUT?
-□ No critical ambiguities?
-□ Technical approach decided?
-□ Test strategy confirmed?
-□ No blocking questions?
-```
+1. Core objective clearly defined?
+2. Scope boundaries — IN and OUT?
+3. No critical ambiguities?
+4. Technical approach decided?
+5. Test strategy confirmed?
+6. No blocking questions?
 
-**ALL YES** → announce: *"All requirements clear. Proceeding to gap review and plan generation."*
+**ALL YES** → announce:
+
+> **✅ All requirements clear.** Proceeding to gap review and plan generation.
+
 **ANY NO** → ask the specific unclear question.
 
 ---
@@ -200,11 +201,15 @@ grep_search("## Final Verification Wave", implementation_plan.md)
 
 **MANDATORY prompt.** Always present this choice to the user via `notify_user`. Do NOT skip this step or auto-select an option.
 
-> "Plan is ready. How would you like to proceed?
->
-> - **Option A — Proceed to Approval**: Plan looks solid, skip critic review.
->
-> - **Option B — Critical Review Pass**: Activate `plan-critic` skill for independent review before approval."
+Present exactly this (with blank lines between options for readability):
+
+```
+Plan is ready. How would you like to proceed?
+
+- **Option A — Proceed to Approval**: Plan looks solid, skip critic review.
+
+- **Option B — Critical Review Pass**: Activate `plan-critic` skill for independent review before approval.
+```
 
 **If Option B**: Load `plan-critic` skill. It handles backend detection, spawns reviewer, writes to `.amag/reviews/`. Loop until APPROVE or user cancels. Archive reviews after final APPROVE.
 
@@ -235,6 +240,8 @@ Present plan via `notify_user` with `BlockedOnUser: true` and `ShouldAutoProceed
 
 **The `/plan` workflow terminates after Step 10.** Do NOT proceed to implementation.
 
-Inform the user: *"Plan saved. Use `/start-work` to begin execution."*
+Inform the user:
+
+> **📋 Plan saved.** Use `/start-work` to begin execution.
 
 **Under no circumstances**: start implementing, edit source files, transition to EXECUTION mode, or interpret approval as a command to execute.

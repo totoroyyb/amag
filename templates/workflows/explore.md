@@ -78,7 +78,19 @@ grep_search("import|include|use ", IsRegex=true)      → module boundaries
 - [Structural observations]
 ```
 
-**Narrate**: Tell the user what you found — "This codebase has N major subsystems: X, Y, Z. I'll explore [most relevant ones] next."
+**Narrate**: Tell the user what you found, using structured formatting:
+
+```
+## Phase 1: Structure Overview
+
+This codebase has N major subsystems:
+
+- **X** — [one-line purpose]
+- **Y** — [one-line purpose]
+- **Z** — [one-line purpose]
+
+I'll explore [most relevant ones] next.
+```
 
 ## Phase 2: Module-by-Module Deep Dives
 <!-- task_boundary: TaskStatus="Phase 2/4: Deep-diving into modules" -->
@@ -114,7 +126,21 @@ For each relevant module (prioritize based on user's question):
 
 **Stopping condition per module**: Stop when same information surfaces from 2+ search angles (convergence). Cap at 3 search rounds per module.
 
-**Narrate**: After each module, tell the user what you found and what's next.
+**Narrate**: After each module, present findings to the user with clear visual separation:
+
+```
+## Module: [Name]
+
+**Purpose**: [What it does]
+
+**Key patterns**: [Notable design decisions]
+
+**Connections**: [How it relates to other modules explored so far]
+
+---
+
+Next: exploring [next module].
+```
 
 ## Phase 3: Cross-Cutting Analysis
 <!-- task_boundary: TaskStatus="Phase 3/4: Analyzing cross-module interactions" -->
@@ -152,11 +178,25 @@ Load `architecture-advisor` skill mindset (read-only consulting mode):
 **Goal**: Consolidate into a coherent understanding delivered to the user.
 
 1. Re-read the research artifact to catch anything missed
-2. Present findings to the user via `notify_user`:
-   - Architecture overview
-   - Key design decisions and trade-offs
-   - Module interaction map
-   - Notable patterns or concerns
+2. Present findings to the user via `notify_user` using structured format:
+
+```
+## Exploration Summary: [Topic]
+
+### Architecture Overview
+[High-level description]
+
+### Key Design Decisions
+- [Decision 1]: [Trade-off and rationale]
+- [Decision 2]: [Trade-off and rationale]
+
+### Module Interactions
+[How modules connect and depend on each other]
+
+### Notable Patterns / Concerns
+- [Pattern or concern with specific file citations]
+```
+
 3. Ask: "What would you like to explore deeper?"
 
 **The workflow stays active** — the user may ask follow-up questions, request deeper dives into specific areas, or ask for comparisons. Continue exploring as directed.

@@ -6,7 +6,9 @@ description: Maximum effort deep work mode — 100% certainty before acting, zer
 
 Activate maximum-effort autonomous execution. You MUST achieve 100% certainty before implementing. Zero scope reduction, zero shortcuts, zero compromises.
 
-**MANDATORY**: Say "ULTRAWORK MODE ACTIVATED" to the user when this mode activates.
+**MANDATORY**: Announce to the user:
+
+> **🚀 ULTRAWORK MODE ACTIVATED**
 
 ## Progress Tracking
 

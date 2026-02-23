@@ -78,15 +78,25 @@ Shift into read-only, high-reasoning consulting mode. When activated, stop imple
 
 **Problem**: [What needs to change and why]
 
-**Recommendation**: [One clear path]
-- Rationale: [Evidence-backed reasoning]
-- Trade-offs: [What you gain, what you give up]
-- Risk: [What could go wrong, how to mitigate]
+---
 
-**Alternatives** (only if substantially different):
+### Recommendation
+
+[One clear path]
+
+- **Rationale**: [Evidence-backed reasoning]
+- **Trade-offs**: [What you gain, what you give up]
+- **Risk**: [What could go wrong, how to mitigate]
+
+---
+
+### Alternatives (only if substantially different)
+
 - [Option B]: Only if [specific condition] applies
 
-**Next steps**: [Concrete actions to proceed]
+### Next Steps
+
+[Concrete actions to proceed]
 ```
 
 ## Hard Rules

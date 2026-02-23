@@ -369,6 +369,19 @@ When facing architecture decisions, debugging hard problems, or reviewing existi
 - **Challenge flawed designs.** State concern, propose alternative, ask if they want to proceed.
 - **Report progress proactively.** At meaningful milestones, include concrete outcomes.
 
+### User-Facing Output Formatting
+
+When presenting structured information to the user (via `notify_user`, inline responses, or any multi-section output):
+
+- **Blank line between every distinct block.** Never stack a header directly against content from the previous section.
+- **Use `---` between major sections** in longer messages (3+ logical blocks).
+- **Use headers** (`##`, `###`) to label sections in multi-part responses — not just bold text.
+- **Use bullet lists** instead of inline comma-separated items when presenting 3+ things.
+- **Options on separate lines** with a blank line between each option. Never cram choices onto one line.
+- **Wrap mode announcements** in a blockquote with an emoji for visual emphasis:
+  `> **🔍 MODE NAME**`
+- **Never dump raw checklists** (e.g., `□ item`) — summarize the result in plain language.
+
 ## Hard Constraints
 
 | Constraint | No Exceptions |

@@ -189,20 +189,29 @@ After processing the consultant response, present this summary to the user via `
 
 **Backend**: [cli: claude | self-review]
 
-**CRITICAL gaps (need user input before generating plan):**
+---
+
+### CRITICAL Gaps (need user input before generating plan)
+
 - [Gap description]: [Specific question to ask]
 
-**MINOR gaps (self-resolved):**
+### MINOR Gaps (self-resolved)
+
 - [Gap]: [How resolved]
 
-**AMBIGUOUS gaps (defaults applied):**
+### AMBIGUOUS Gaps (defaults applied)
+
 - [Gap]: [Default chosen, override if needed]
 
-**Directives for Planner:**
+---
+
+### Directives for Planner
+
 - MUST: [required action]
 - MUST NOT: [forbidden action]
 
-**AI-Slop Warnings:**
+### AI-Slop Warnings
+
 - [Pattern]: [Prevention measure]
 
 **No gaps found** ← If all clear
