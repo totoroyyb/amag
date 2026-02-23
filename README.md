@@ -1,8 +1,12 @@
+<div align="center">
+
 # AMAG: All Mighty AntiGravity
 
 Agent orchestration for [Antigravity](https://antigravity.google). Curated rules, workflows, and skills that transform Antigravity's AI agent into a disciplined engineering partner.
 
 Inspired by [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) — rebuilt from scratch for Antigravity's native tooling.
+
+</div>
 
 ## Quick Start
 
@@ -126,7 +130,8 @@ npx @totoroyyb/amag config reset                              # Reset to default
 
 Thinking levels: `max`, `high`, `medium`, `low`, `none`.
 
-Configuration is stored in `.amag/config.json` in your project root. This file is created during `init` or `update` with sensible defaults. You can modify it via the CLI commands above or edit the JSON directly.
+> [!NOTE]
+> Configuration is stored in `.amag/config.json` in your project root. This file is created during `init` or `update` with sensible defaults. You can modify it via the CLI commands above or edit the JSON directly.
 
 ### Prerequisites
 
@@ -138,7 +143,8 @@ External agent features require the corresponding CLI tools to be installed and 
 | [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | `codex login` |
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `npm install -g @google/gemini-cli` | You might need to login with `gemini` CLI first |
 
-If no external CLI is configured or available, AMAG falls back to native single-agent review — everything still works, just without the multi-model perspective.
+> [!TIP]
+> If no external CLI is configured or available, AMAG falls back to native single-agent review — everything still works, just without the multi-model perspective.
 
 ## CLI Reference
 
