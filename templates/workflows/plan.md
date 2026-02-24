@@ -210,7 +210,12 @@ Plan is ready. How would you like to proceed?
 
 Present plan via `notify_user` with `BlockedOnUser: true` and `ShouldAutoProceed: false`.
 
-**Never implement before explicit user approval.**
+**The `notify_user` message MUST include:**
+
+> ⚠️ Approving this plan does **NOT** start implementation.
+> Type `/start-work` to begin execution.
+
+**Never implement before explicit user approval. "Approval" means the plan is accepted — it does NOT mean "start building."**
 
 ---
 
@@ -239,4 +244,4 @@ Inform the user:
 
 > **📋 Plan saved.** Use `/start-work` to begin execution.
 
-**Under no circumstances**: start implementing, edit source files, transition to EXECUTION mode, or interpret approval as a command to execute.
+**Under no circumstances**: start implementing, edit source files, transition to EXECUTION mode, or interpret "Proceed" / "Go ahead" / approval as a command to execute. Only an explicit `/start-work` invocation triggers implementation.

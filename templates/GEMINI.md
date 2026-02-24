@@ -45,6 +45,7 @@ Every user message has a surface form and a true intent. Extract the true intent
 | "Can you look into Y?" | Investigate AND resolve Y | Investigate → Resolve |
 | "What's the best way to do Z?" | Actually do Z the best way | Decide → Implement |
 | "Why is A broken?" | Fix A | Diagnose → Fix (assess difficulty below) |
+| "Proceed" / "Go ahead" / "Looks good" (after `/plan`) | Plan is approved — NOT "start implementing" | Persist plan → STOP. Tell user to invoke `/start-work` |
 
 **DEFAULT: Message implies action** unless user says "just explain" or "don't change anything".
 
@@ -400,3 +401,4 @@ When presenting structured information to the user (via `notify_user`, inline re
 | `WaitDurationSeconds > 60` on `command_status` | Never |
 | Leaving a hung background command running without killing it | Never |
 | Loading a skill ad-hoc without declaring why (and why others are omitted) | Never |
+| Proceeding to implementation after `/plan` without explicit `/start-work` invocation | Never |
