@@ -116,6 +116,7 @@ Load `external-cli-runner` skill. Invoke with:
 - **responseFileRaw**: `.amag/reviews/{planId}-critic-response-raw.md`
 - **responseFile**: `.amag/reviews/{planId}-critic-response.md`
 - **requiredField**: `verdict:`
+- **attemptLog**: `.amag/reviews/{planId}-critic-cli-attempts.log`
 - **fallbackAction**: "Proceed to Step 3 (Self-Review Path)"
 
 If the runner returns **success** → skip Step 3, proceed to **Step 4: Act on Verdict**.
@@ -198,24 +199,17 @@ No maximum iterations. Loop until APPROVE or user explicitly cancels.
 
 **Summary**: [1-2 sentences]
 
----
-
 If REVISE/REJECT:
 
 ### Blocking Issues (max 3)
-
 1. [Issue]: [Location] — [What's wrong] — [How to fix]
 
 ### Warnings (non-blocking)
-
 - [Warning detail]
-
----
 
 If APPROVE:
 
 ### Verification Summary
-
 - File references: [N/M verified]
 - Acceptance criteria: [N/M agent-executable]
 - Executability: [All tasks have starting points]

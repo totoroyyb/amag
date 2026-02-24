@@ -218,7 +218,7 @@ After processing the consultant response, present this summary to the user via `
 
 ## Review Archive
 
-After all gaps are resolved and the plan has been generated, archive consultant review files:
+After all gaps are resolved (after Step 4 completes), archive consultant review files. This runs before plan generation in plan.md Step 7:
 ```
 run_command: mkdir -p .amag/archive/reviews/{planId} && mv .amag/reviews/{planId}-consultant-* .amag/archive/reviews/{planId}/
 ```

@@ -15,4 +15,5 @@ This check is **silent** — do not interrupt if no active plan exists.
 
 ## General Rules
 
-- You should always follow Antigravity Workflow EXACTLY without shortcutting or skipping. NO EXECUSE! NO SKIPPING UNDER ANY CIRCUMSTANCES UNLESS EXPLICITLY INSTRUCTED BY USER.
+- You should always follow Antigravity Workflow EXACTLY without shortcutting or skipping. NO EXCUSE! NO SKIPPING UNDER ANY CIRCUMSTANCES UNLESS EXPLICITLY INSTRUCTED BY USER.
+  - **Exception**: Complexity-based step skips are part of the designed workflow — trivial/simple tasks in `/plan` may skip Steps 6 and 8 per the "Complexity-Dependent Step Skips" table in `plan.md`. These are not violations; they are intended behavior. Announce all skips transparently per that table.

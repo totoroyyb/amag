@@ -7,13 +7,7 @@ description: Structured planning interview before implementation — plan before
 Classify complexity → explore codebase → detect tests → interview → clearance check → **consultant gap review (HARD STOP)** → generate plan → **critic prompt** → approval → persist.
 
 > [!IMPORTANT]
-> **You are a planner. You do not implement.** Every request — "fix X", "build Y", "add Z" — means "create a work plan for X/Y/Z". You only write `implementation_plan.md` and optionally `.amag/drafts/*.md`. Nothing else.
-
-> [!IMPORTANT]
-> **Auto-Ultrawork rigor applies to plan quality.** The plan-approve-execute gate is never bypassed. This workflow produces a plan for user review — it never executes.
-
-> [!TIP]
-> **Explore handoff**: If a `research-findings.md` artifact exists (from a prior `/explore`), read it as pre-existing context. Skip redundant exploration.
+> **You are a planner. You do not implement.** Every request means "create a work plan". You only write `implementation_plan.md` and optionally `.amag/drafts/*.md`. The plan-approve-execute gate is **never bypassed** — this workflow never executes. If a `research-findings.md` artifact exists (from a prior `/explore`), read it as pre-existing context.
 
 ## Progress Tracking
 
@@ -35,6 +29,23 @@ Call `task_boundary` at **every step transition** with:
 | **Complex** | 3+ files, architectural impact | Full interview loop |
 
 State: *"This is [trivial/simple/complex] because [reason]."*
+
+### Complexity-Dependent Step Skips
+
+Trivial and Simple tasks may skip heavy steps. **When skipping, you MUST announce the skip** via `notify_user` using this template:
+
+> ℹ️ **Skipped: {step name}** — Task classified as {trivial/simple} because {reason}.
+> You can still run this step manually: say **"run gap analysis"** or **"run critic review"**.
+
+Set `ShouldAutoProceed: true` for trivial skips, `ShouldAutoProceed: false` for simple skips (give user a moment to override).
+
+| Step | Trivial | Simple | Complex |
+|------|---------|--------|---------|
+| Steps 1-2 (Research + Tests) | Skip or minimal | Targeted | Full |
+| Step 3 (Interview) | Quick confirm only | 1-2 questions | Full loop |
+| Step 5 (AI-Slop scan) | Skip | Skip | Run |
+| **Step 6 (Gap Review)** | **Skip — announce** | **Skip — announce** | **MANDATORY** |
+| **Step 8 (Critic Prompt)** | **Skip — announce** | **Auto-select A — announce** | **MANDATORY prompt** |
 
 ---
 
@@ -65,7 +76,7 @@ Launch **parallel searches** based on type:
 
 Search for test config files (`jest.config*`, `vitest.config*`, `*.test.*`, `*.spec.*`, `package.json` test scripts).
 
-**If tests exist**: Ask which strategy — **TDD** (red→green→refactor), **Tests after**, or **No tests**. Note: agent-executable QA scenarios are always present regardless.
+**If tests exist**: Ask: **TDD** (red→green→refactor), **Tests after**, or **No tests**. Note: agent-executable QA scenarios are always present regardless.
 
 **If no tests**: Ask whether to set up test infrastructure as part of this plan.
 
@@ -117,13 +128,19 @@ Quick scan before generating — cut scope inflation, premature abstraction, ove
 
 ---
 
+## Step 6: Pre-Generation Gap Review
+<!-- task_boundary: TaskStatus="Step 7/10: Running plan consultant (gap review)" -->
+
+**Trivial/Simple tasks**: Announce the skip via `notify_user` (use skip template from Step 0). Set `ShouldAutoProceed: true` (trivial) / `false` (simple). Note in plan: `## Plan Consultant Summary: Skipped — task classified as [trivial/simple]`. Then proceed to Step 7.
+
+**Complex tasks**: The HARD STOP below applies — no exceptions.
+
 > [!CAUTION]
-> ## Step 6: Pre-Generation Gap Review — HARD STOP
-> <!-- task_boundary: TaskStatus="Step 7/10: Running plan consultant (gap review)" -->
+> ### Complex Tasks Only — HARD STOP
 >
 > **MANDATORY. NON-NEGOTIABLE. No exceptions.** Do NOT skip this step, jump to plan generation, or reason that "the interview was thorough enough." Self-assessed thoroughness is unreliable.
 >
-> **GATE**: Step 7 is BLOCKED until ALL four conditions pass:
+> **GATE**: Step 7 (Generate Plan) is BLOCKED until ALL four conditions pass:
 > 1. ✅ `.amag/reviews/{planId}-consultant-response.md` exists (verified via `run_command`)
 > 2. ✅ Response contains a `verdict:` line (verified via `grep_search`)
 > 3. ✅ All CRITICAL gaps resolved
@@ -131,23 +148,15 @@ Quick scan before generating — cut scope inflation, premature abstraction, ove
 >
 > **If ANY condition fails → you CANNOT proceed. Period.**
 
-Load `plan-consultant` skill **NOW**. Read its SKILL.md and follow every step. The skill handles: gap analysis through six categories, writing review files to `.amag/reviews/`, and CLI delegation (via `external-cli-runner` skill) with automatic fallback to self-review.
+Load `plan-consultant` skill **NOW**. Follow every step. It handles gap analysis, writes to `.amag/reviews/`, delegates via `external-cli-runner` with fallback to self-review.
 
-### Mandatory Completion Gate
-
-After the skill completes, verify:
-
+**After skill completes**, verify GATE PASS:
 ```
-run_command: test -f .amag/reviews/{planId}-consultant-request.md && test -f .amag/reviews/{planId}-consultant-response.md && test -f .amag/reviews/{planId}-consultant-cli-attempts.log && echo "GATE PASS" || echo "GATE FAIL"
-grep_search("verdict:", ".amag/reviews/{planId}-consultant-response.md")
+test -f .amag/reviews/{planId}-consultant-response.md && test -f .amag/reviews/{planId}-consultant-cli-attempts.log && grep verdict: .amag/reviews/{planId}-consultant-response.md && echo GATE PASS || echo GATE FAIL
 ```
+**If `GATE FAIL`**: Re-run consultant skill. Still fails → self-review fallback.
 
-**If `GATE FAIL` or no verdict**: Re-run the consultant skill. If it fails again → fall back to self-review.
-
-**Handle gaps:**
-- **CRITICAL** → surface via `notify_user` → wait → re-run clearance → re-run gap review
-- **MINOR** → fix silently, note in plan
-- **AMBIGUOUS** → apply default, disclose in plan
+**Handle gaps:** CRITICAL → `notify_user` → wait → re-run clearance + gap review. MINOR → fix silently, note in plan. AMBIGUOUS → apply default, disclose.
 
 ---
 
@@ -189,7 +198,11 @@ grep_search("## Final Verification Wave", implementation_plan.md)
 ## Step 8: High-Accuracy Gate
 <!-- task_boundary: TaskStatus="Step 9/10: Presenting plan for review" -->
 
-**MANDATORY prompt.** Always present this choice to the user via `notify_user`. Do NOT skip this step or auto-select an option.
+**Trivial/Simple tasks**: Auto-select Option A (no critic). Announce via `notify_user` (skip template from Step 0, combined with the Step 9 approval message to avoid an extra round-trip). Then proceed to Step 9.
+
+**Complex tasks**: The MANDATORY prompt below applies — no exceptions.
+
+**MANDATORY prompt (complex only).** Present this choice to the user via `notify_user`. Do NOT skip or auto-select an option.
 
 Present exactly this (with blank lines between options for readability):
 
@@ -206,16 +219,14 @@ Plan is ready. How would you like to proceed?
 ---
 
 ## Step 9: Wait for Approval
-<!-- task_boundary: TaskStatus="Step 10/10: Waiting for user approval" -->
+<!-- task_boundary: TaskStatus="Step 9/10: Waiting for user approval" -->
 
-Present plan via `notify_user` with `BlockedOnUser: true` and `ShouldAutoProceed: false`.
-
-**The `notify_user` message MUST include:**
+Present plan via `notify_user` with `BlockedOnUser: true` and `ShouldAutoProceed: false`. The message MUST include:
 
 > ⚠️ Approving this plan does **NOT** start implementation.
 > Type `/start-work` to begin execution.
 
-**Never implement before explicit user approval. "Approval" means the plan is accepted — it does NOT mean "start building."**
+**Never implement before explicit user approval. Approval means the plan is accepted, not "start building."**
 
 ---
 

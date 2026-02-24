@@ -104,7 +104,7 @@ Stop searching when:
 - 3 rounds of search yielded no new useful data
 - A direct answer was found
 
-**Cap at 3 rounds. Do NOT over-explore. Time is precious.**
+**Cap at 2 rounds. Do NOT over-explore. Time is precious.** (Matches GEMINI.md Exploration Protocol.)
 
 ## Synthesis Format
 

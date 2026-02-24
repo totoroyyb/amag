@@ -90,8 +90,9 @@ For each hypothesis: **Predict** → **Test** → **Observe** → **Verdict** (C
 **Output**: Confirmed root cause with evidence — explain WHY the bug exists, not just WHERE.
 
 ## Deep Analysis Checkpoint
+<!-- Runs between Phase 3 and Phase 4. Phase 4 only begins after Option A is chosen. -->
 
-After presenting your confirmed root cause, **offer the user a choice** via `notify_user` (`BlockedOnUser: true`):
+After presenting your confirmed root cause (Phase 3 output), **pause and offer the user a choice** via `notify_user` (`BlockedOnUser: true`) before proceeding to Phase 4:
 
 ```
 ## Root Cause Found
