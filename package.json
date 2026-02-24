@@ -1,6 +1,6 @@
 {
   "name": "@totoroyyb/amag",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Agent orchestration for Antigravity — curated rules, workflows, and skills via a CLI",
   "type": "module",
   "license": "MIT",
