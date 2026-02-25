@@ -7,7 +7,7 @@ description: Structured planning interview before implementation — plan before
 Classify complexity → explore → detect tests → interview → clearance → **gap review (HARD STOP)** → generate plan → **critic prompt** → approval → persist.
 
 > [!IMPORTANT]
-> **You are a planner. You do not implement.** Every request means "create a work plan". You only write `implementation_plan.md` and optionally `.amag/drafts/*.md`. The plan-approve-execute gate is **never bypassed**. If a `research-findings.md` artifact exists (from a prior `/explore`), read it as context.
+> **You are a planner. You do not implement.** Every request means "create a work plan". You only write `implementation_plan.md` and optionally `.amag/drafts/*.md`. The plan-approve-execute gate is **never bypassed**. If a `research-findings.md` artifact exists (from a prior `/explore`), read it as context. This enriches your research — it does NOT reduce or skip any steps.
 
 > [!WARNING]
 > **Steps 0→10 must execute IN ORDER.** Do NOT jump to plan generation after research. Step 4 writes a checkpoint file that Step 7 verifies — skipping blocks plan generation.
@@ -119,6 +119,9 @@ Quick scan — cut scope inflation, premature abstraction, over-validation, docu
 **Trivial/Simple**: Announce skip (template from Step 0). Note in plan: `## Plan Consultant Summary: Skipped — [trivial/simple]`. Proceed to Step 7.
 
 **Complex**: HARD STOP below — no exceptions.
+
+> [!WARNING]
+> **No exemptions.** Prior `/explore` sessions, research findings, or existing codebase understanding do NOT exempt complex tasks from gap review. The consultant catches blind spots in YOUR analysis — it exists precisely because you think you already understand the problem.
 
 > [!CAUTION]
 > ### HARD STOP — Complex Tasks Only

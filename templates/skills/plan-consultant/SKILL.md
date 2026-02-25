@@ -13,6 +13,9 @@ Derived from OMO's Metis agent (pre-planning consultant, read-only, intent class
 
 **Only during `/plan` workflow**, at Step 6 (Pre-Generation Gap Review) — after the interview is complete and clearance check has passed, but BEFORE generating `implementation_plan.md`.
 
+> [!CAUTION]
+> **Never skip for complex tasks.** Prior research, `/explore` sessions, or confidence in your understanding are NOT valid reasons to skip this skill. The consultant exists to catch YOUR blind spots.
+
 ## Step 1: Write Review Request
 
 Write the request file via `write_to_file` to `.amag/reviews/{planId}-consultant-request.md`.
